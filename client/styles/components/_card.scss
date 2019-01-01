@@ -1,0 +1,24 @@
+.card {
+  width: 80%;
+  height: 100%;
+  position: relative;
+  display: block;
+  border: solid 1px $border-default;
+  border-radius: .5rem;
+  background: $color-white;
+  padding: 2rem;
+  .col-3.image {
+    width: 20rem;
+    height: 20rem;
+    img {
+      position: relative;
+      top: 1rem;
+    }
+  }
+  #user-info {
+    background: #f1f1f1;
+    padding: 3rem 1rem;
+    border: solid 1px $border-default;
+    border-radius: .5rem;
+  }
+}

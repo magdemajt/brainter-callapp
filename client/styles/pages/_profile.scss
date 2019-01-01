@@ -1,0 +1,21 @@
+.name {
+  font-size: 2rem;
+}
+.desc {
+  margin-top: 1rem;
+  textarea {
+    min-height: 10rem;
+    min-width: 30rem;
+    max-width: 44rem;
+    max-height: 20rem;
+  }
+}
+.tag-input {
+  width: 3.5rem;
+  float: right;
+}
+#profile-image {
+  width: 18rem;
+  border-radius: 50%;
+  border: solid 1px $border-default;
+}

@@ -1,0 +1,127 @@
+@mixin display-flex {
+  display: flex;
+  align-items: center;
+}
+.container {
+  max-width: 114rem;
+  height: $container-height; 
+  position: relative;
+  &.fluid {
+    max-width: 95vw;
+    width: 95vw;
+    height: $fluid-min-height;
+  }
+  &.left {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+  &.height-60 {
+    height: 60vh;
+  }
+  &.center {
+    margin: auto;
+  }
+  &.flex {
+    display: flex;
+    &.justify-center {
+      justify-content: center;
+    }
+    &.space-between {
+      justify-content: space-between;
+    }
+  }
+  &.offset-15 {
+    top: 15rem;
+  }
+  &.full {
+    min-width: 100vw;
+  }
+  &.full-70 {
+    min-width: 70vw;
+  }
+  &.fixed {
+    position: fixed;
+    &.bottom {
+      height: 8rem;
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+.centerbar {
+  width: 50vw;
+  float: left;
+}
+#dropzone-image {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.col-3 {
+  width: 30%;
+}
+.col-5 {
+  width: 50%;
+}
+.col-4 {
+  width: 40%;
+}
+.col-10 {
+  width: 100%;
+}
+.row-1 {
+  width: 100%;
+  height: 10%;
+  @include display-flex;
+}
+.row-2 {
+  width: 100%;
+  height: 20%;
+  @include display-flex;
+}
+.row-5 {
+  width: 100%;
+  height: 50%;
+  @include display-flex;
+}
+.row {
+  width: 100%;
+  @include display-flex;
+}
+.scroll-y {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.justify-center {
+  justify-content: center;
+}
+.column {
+  flex-direction: column;
+  &.expanded {
+    height: 50vh;
+    justify-content: flex-start;
+    
+  }
+}
+.ml-20 {
+  margin-left: 20rem;
+}
+.ml-1-5 {
+  margin-left: 1.5rem;
+}
+.mt-20 {
+  margin-top: 20rem;
+}
+.mt-5 {
+  margin-top: 5rem;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.mti-2 {
+  margin-top: 2rem!important;
+}
+.mb-5 {
+  margin-bottom: 5rem;
+}

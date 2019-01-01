@@ -1,0 +1,25 @@
+.messageButton {
+    width: 4rem;
+    margin: .5rem 0;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 18px;
+        content: url('./icons/message-color.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}

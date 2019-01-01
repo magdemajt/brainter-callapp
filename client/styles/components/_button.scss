@@ -1,0 +1,95 @@
+.btn {
+    font-size: 1.6rem;
+    color: white;
+    width: 15rem;
+    min-height: 4rem;
+    height: 4rem;
+    margin: $default-margin 0;
+    border: 1px solid $color-blue;
+    border-radius: .5rem;
+    background: $color-blue;
+    transition: .3s;
+    &:focus { 
+        outline: 0;
+    }
+    &.secondary {
+        border: 1px solid $color-secondary;
+        background: $color-secondary;
+        transition: .3s;
+        &:hover:not(.disabled) {
+            box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+            background: invert($color-blue, 1);
+            color: white;
+            transform: translateY(-.3rem) scale(1.025);   
+        }
+        &.disabled {
+            background: $color-disabled;
+            transition: none;
+        }
+    }
+    &.success {
+        border: 1px solid $color-success;
+        background: $color-success;
+        transition: .3s;
+        &:hover:not(.disabled) {
+            box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+            background: transparent;
+            color: $color-success;
+            transform: translateY(-.3rem) scale(1.025);   
+        }
+        &.disabled {
+            background: $color-disabled;
+            transition: none;
+        }
+    }
+    &.outline-success {
+        border: 1px solid $color-success;
+        color: $color-success;
+        background: transparent;
+        transition: .3s;
+        &:hover:not(.disabled) {
+            box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+            background: invert($color-success, 1);
+            color: white;
+            transform: translateY(-.3rem) scale(1.025);   
+        }
+        &.disabled {
+            background: $color-disabled;
+            transition: none;
+        }
+    }
+    &.default {
+        border: 1px solid $color-blue;
+        background: transparent;
+        color: $color-blue;
+        transition: .3s;
+        &:hover:not(.disabled) {
+            box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+            background: invert($color-secondary, 1);
+            transform: translateY(-.3rem) scale(1.025);   
+        }
+        &.disabled {
+            background: $color-disabled;
+            transition: none;
+        }
+    }
+    &.float-right {
+        @include float('right');
+    }
+    &.float-left {
+        @include float('left');
+    }
+    &:hover:not(.disabled) {
+        box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+        background: invert($color-secondary, 1);
+        transform: translateY(-.3rem) scale(1.025);
+        color: $color-blue;
+    }
+    &.disabled {
+        background: $color-disabled;
+        transition: none;
+    }
+    &.huge {
+        min-width: 35rem;
+    }
+}

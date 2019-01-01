@@ -1,0 +1,19 @@
+.badge {
+  width: 2rem;
+  float: right;
+  height: 2rem;
+  border: 1px solid black;
+  border-radius: 50%;
+  &.rookie {
+    background: $color-success;
+    border-color: $color-success;
+  }
+  &.medium {
+    background: $color-blue;
+    border-color: $color-blue;
+  }
+  &.master {
+    background: $color-secondary;
+    border-color: $color-secondary;
+  }
+}

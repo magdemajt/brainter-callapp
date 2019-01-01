@@ -1,0 +1,17 @@
+.sidebar {
+  float: left;
+  height: 60vh;
+  width: 25vw;
+  &.right {
+    float: right;
+  }
+  &.flex {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+  &.small {
+    width: 15vw;
+  }
+}

@@ -1,0 +1,29 @@
+.call-button {
+    width: 4rem;
+    float: right;
+    margin: .5rem 0;
+    top: -1px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        content: url('./icons/call-icon.png');
+    }
+    &:hover::before {
+        width: 24px;
+        height: 24px;
+        content: url('./icons/call-icon-color.png');
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}

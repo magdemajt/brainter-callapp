@@ -1,0 +1,173 @@
+#unmuteButton {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/mute-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    // &:hover::before {
+    //     width: 32px;
+    //     height: 32px;
+    //     content: url('./icons/.png');
+    // }
+    &:hover {
+        cursor: pointer;
+    }
+}
+#muteButton {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/unmute-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+#videoButton {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/video-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    // &:hover::before {
+    //     width: 32px;
+    //     height: 32px;
+    //     content: url('./icons/.png');
+    // }
+    &:hover {
+        cursor: pointer;
+    }
+}
+#novideoButton {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/no-video-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    // &:hover::before {
+    //     width: 32px;
+    //     height: 32px;
+    //     content: url('./icons/.png');
+    // }
+    &:hover {
+        cursor: pointer;
+    }
+}
+#disconnectButton {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(135deg);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/reject-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+#talkDiv {
+    position: relative;
+    width: 80rem;
+    height: 60rem;
+}
+#localVideo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+#remoteVideo {
+    width: 40rem;
+    height: 30rem;
+    right: 0;
+    top: 0;
+}
+#buttonsDiv {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

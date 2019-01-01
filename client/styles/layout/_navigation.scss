@@ -1,0 +1,100 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 15rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  .nav-item {
+    position: relative;
+    width: 6.4rem;
+    margin: 0 1rem;
+    height: 6.4rem;
+    a {
+      position: absolute;
+      border: solid 1px black;
+      box-shadow: 2px 2px 5px black;
+      &:hover {
+        transform: scale(1.10) translateY(-3px);
+        background: $color-secondary;
+        box-shadow: 5px 5px 5px black;
+      }
+      left: 0;
+      min-width: 4.8rem;
+      min-height: 4.8rem;
+      border-radius: 50%;
+      transition: all .5s;
+      background: white;
+      text-decoration: none;
+      color: black;
+    }
+    #Messages {
+      &::before {
+        position: absolute;
+        left: 50%;
+        transform: translate(-49%, -49%);
+        top: 50%;
+        width: 3.2rem;
+        height: 1.8rem;
+        content: url('./icons/message.png');
+      }
+      &:hover::before {
+        content: url('./icons/message-color.png');
+      }
+      
+    }
+    #Settings {
+      &::before {
+        position: absolute;
+        left: 50%;
+        transform: translate(-49%, -49%);
+        top: 50%;
+        width: 2.8rem;
+        height: 3.2rem;
+        content: url('./icons/settings.png');
+      }
+      &:hover::before {
+        content: url('./icons/settings-color.png');
+      }
+      
+    }
+    #Users {
+      &::before {
+        position: absolute;
+        left: 50%;
+        transform: translate(-49%, -49%);
+        top: 50%;
+        width: 3rem;
+        height: 3.2rem;
+        content: url('./icons/users.png');
+      }
+      &:hover::before {
+        content: url('./icons/users-color.png');
+      }
+      
+    }
+    #Profile {
+      &::before {
+        position: absolute;
+        left: 50%;
+        transform: translate(-49%, -49%);
+        top: 50%;
+        width: 1.9rem;
+        height: 3.2rem;
+        content: url('./icons/profile.png');
+      }
+      &:hover::before {
+        content: url('./icons/profile-color.png');
+      }
+      
+    }
+    &.left {
+      float: left;
+    }
+    &.right {
+      float: right;
+    }
+  }
+}

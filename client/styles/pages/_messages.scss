@@ -1,0 +1,31 @@
+#send-btn {
+    width: 4rem;
+    margin: .5rem 0;
+    top: -10px;
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 32px;
+        content: url('./icons/send-arrow-big.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    &:hover::before {
+        width: 32px;
+        height: 32px;
+        content: url('./icons/send-arrow-big-color.png');
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}

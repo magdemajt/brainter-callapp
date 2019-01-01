@@ -1,0 +1,24 @@
+.input {
+  width: 100%;
+  padding: 1.2rem 2rem;
+  margin: $default-margin 0;
+  border: solid $border-default 2px;
+  border-radius: .5rem;
+  outline-color: transparent;
+  transition: .3s;
+  &:focus {
+    transform: scale(1.01);
+    outline: solid transparent 2px;
+    outline-offset: 2px;
+  }
+  &.nowidth {
+    width: unset;
+  } 
+}
+#message-input {
+  min-width: 40rem;
+  width: 30%;
+  height: 4rem;
+  resize: none;
+  text-align: center;
+}

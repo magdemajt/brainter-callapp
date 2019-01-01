@@ -1,0 +1,158 @@
+.message-users-list {
+  list-style-type: none;
+  li {
+    margin: .8rem 0;
+    font-size: 1.6rem;
+    border: 1px solid $color-secondary;
+    border-radius: .5rem;
+    color: darken($color-secondary, 20);
+    box-shadow: 1px 1px 1px black;
+    transition: all .5s;
+    &:hover {
+      background: $color-secondary;
+      color: $color-blue;
+      cursor: pointer;
+      box-shadow: 3px 3px 3px black;
+      transform: translateY(-3px) scaleY(1.05) scaleX(1.0125);
+    }
+    &.active {
+      background-color: $color-blue;
+      color: $color-secondary;
+      border: $color-secondary 1px solid;
+      transform: scaleY(1.2) scaleX(1.05);
+      &:hover {
+        background: $color-secondary;
+        color: $color-blue;
+        transform: translateY(-2px) scaleY(1.1) scaleX(1.025);
+      }
+    }
+  }
+}
+.tags-list {
+  list-style-type: none;
+  border: 1px solid $border-default;
+  border-radius: .5rem;
+  padding: 1rem .2rem;
+  margin-top: 10rem;
+  height: 50%;
+  .tag {
+    margin: .5rem 0;
+    font-size: 1.6rem;
+    color: black;
+    border-radius: .5rem;
+    height: 2.5rem;
+  }
+  .minus {
+    width: 2rem;
+    float: right;
+    margin-left: .5rem;
+    position: relative;
+    height: 2rem;
+    border-radius: 50%;
+    background: white;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -35%);
+      width: 16px;
+      height: 4px;
+      content: url('./icons/minus.png');
+    }
+    &:hover::before {
+      width: 16px;
+      height: 4px;
+      content: url('./icons/minus-color.png');
+    }
+  }
+  .plus {
+    width: 2rem;
+    float: right;
+    margin-left: .5rem;
+    position: relative;
+    height: 2rem;
+    border-radius: 50%;
+    background: white;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      content: url('./icons/plus.png');
+    }
+    &:hover::before {
+      width: 16px;
+      height: 16px;
+      content: url('./icons/plus-color.png');
+    }
+  }
+}
+.users-list {
+  list-style-type: none;
+  margin: auto;
+  width: 25%;
+  li {
+    margin: .8rem 0;
+    height: 5rem;
+    font-size: 1.6rem;
+    border: 1px solid $border-default;
+    border-radius: .5rem;
+    box-shadow: 1px 1px 1px black;
+    transition: all .5s;
+    img {
+      width: 3.2rem;
+      border-radius: 50%;
+    }
+    .view-profile-button {
+      width: 4rem;
+      float: right;
+      margin: .5rem 0;
+      top: -1px;
+      position: relative;
+      height: 4rem;
+      border-radius: 50%;
+      background: transparent;
+      transition: all .5s;
+      border: solid transparent 1px;
+      &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 19px;
+        height: 32px;
+        content: url('./icons/profile.png');
+      }
+      &:hover::before {
+        width: 19px;
+        height: 32px;
+        content: url('./icons/profile-color.png');
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    &:hover {
+      background: $color-secondary;
+      color: $color-blue;
+      box-shadow: 3px 3px 3px black;
+      transform: translateY(-3px) scaleY(1.05) scaleX(1.0125);
+    }
+    &.active {
+      background-color: $color-blue;
+      color: $color-secondary;
+      border: $color-secondary 1px solid;
+      transform: scaleY(1.2) scaleX(1.05);
+      &:hover {
+        background: $color-secondary;
+        color: $color-blue;
+        transform: translateY(-2px) scaleY(1.1) scaleX(1.025);
+      }
+    }
+  }
+}
