@@ -26,7 +26,21 @@ const phrases = {
     disconnect: 'Disconnect',
     answer: 'Answer call',
     reject: 'Reject call',
-    talk: 'Talk'
+    talk: 'Talk',
+    startCall: 'Start calling',
+    cancelCall: 'Cancel call'
+  },
+  survey: {
+    topic: 'Topic: ',
+    teacher: 'Teacher: ',
+    date: 'Date of lesson: ',
+    info: 'If you change the talk your progress won\'t be saved, to change doubleclick the desired talk',
+    culture: 'Rate personal culture of teacher',
+    lesson: 'Your overall lesson rating',
+    teaching: 'Rate teaching abilites of teacher',
+    knowledge: 'Rate the understanding of taught subject',
+    comment: 'Here enter your comment...',
+
   },
   user: {
     sendmsg: 'Send message'

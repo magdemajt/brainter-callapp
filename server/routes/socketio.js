@@ -7,7 +7,10 @@ const {
   createPeerConnection,
   createPeer,
   receiverStream,
-  getToken
+  getToken,
+  finishCall,
+  userSurveys,
+  finishSurvey
 } = require('../controllers/talkController');
 const {
   createNewMessage,
@@ -24,7 +27,10 @@ module.exports = (io) => {
     socket.on('get_token', data => getToken(io, socket, data));
     socket.on('create_incoming_call', data => createNewCall(io, socket, data));
     socket.on('abort_call_client', data => abortCall(io, socket, data));
+    socket.on('finish_call_client', data => finishCall(io, socket, data));
     socket.on('answer_call_client', data => answerCall(io, socket, data));
+    socket.on('get_surveys', data => userSurveys(io, socket, data));
+    socket.on('finish_survey', data => finishSurvey(io, socket, data));
     socket.on('incoming_call', data => handleIncomingCall(io, socket, data));
     socket.on('create_peer_connection', data => createPeerConnection(io, socket, data));
     socket.on('peer_connection', data => createPeer(io, socket, data));

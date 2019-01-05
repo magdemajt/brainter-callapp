@@ -14,13 +14,14 @@ exports.createNewCall = (io, socket, data) => {
   const talk = new Talk({
     topic: data.topic,
     messageUser: data.messageUser,
-    tags: data.tags
+    tags: data.tags,
+    caller: data.caller
   });
   talk.save();
   MessageUser.findById(data.messageUser).then((mUser) => {
     mUser.participants.forEach((part) => {
       if (part.toString() !== socket.authUser._id.toString()) {
-        io.to(`room_${part}`).emit('incoming_call', { talk });
+        io.to(`room_${part}`).emit('incoming_call', { talk: { ...talk, tags: data.tags } });
       }
     });
   }).catch((err) => {
@@ -28,6 +29,29 @@ exports.createNewCall = (io, socket, data) => {
   });
   socket.join(`talk_${data.messageUser}`);
   socket.emit('created_talk', { talk });
+};
+
+exports.finishCall = (io, socket, data) => {
+  Talk.findById(data.talk._id).populate('messageUser').then(talk => {
+    const surveys = talk.messageUser.participants.filter(part => {
+      return part !== talk.caller;
+    });
+    talk.finishedAt = Date.now();
+    talk.surveys = surveys;
+    talk.save();
+  });
+};
+
+exports.userSurveys = (io, socket, data) => {
+  Talk.getSurveysByUser(socket.authUser._id, (talks) => {
+    socket.emit('surveys', { talks });
+  });
+};
+
+exports.finishSurvey = (io, socket, data) => {
+  Talk.update({ _id: data.talk._id }, { surveys: { $pull: { respondent: socket.authUser._id }, $push: data.talk.surveys[0] } }).then(() => {
+
+  });
 };
 
 exports.abortCall = (io, socket, data) => {

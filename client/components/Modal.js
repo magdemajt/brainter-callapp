@@ -13,12 +13,20 @@ const Modal = (props) => {
             {props.children}
           </div>
           <div className="footer">
+          {props.confirmButton !== undefined ? props.confirmButton : 
+            (
             <button id={props.calling ? 'modalAnswerButton' : 'modalConfirmButton'} onClick={props.onConfirmModal}>
               <i className="border" /> 
             </button>
+            )
+          }
+          {props.cancelButton !== undefined ? props.cancelButton :
+            (
             <button id={props.calling ? 'modalRejectButton' : 'modalCancelButton'} onClick={props.onCancelModal}>
               <i className="border" />
             </button>
+            )
+          }
           </div>
         </div>
       </div>

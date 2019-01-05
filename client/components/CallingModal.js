@@ -2,6 +2,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Modal from './Modal';
+import Tooltip from 'rc-tooltip';
+import { translate } from 'react-polyglot';
 
 class CallingModal extends React.Component {
   constructor(props) {
@@ -37,21 +39,24 @@ class CallingModal extends React.Component {
           </li>
         );
       }),
-      tags: this.state.tags.filter(el => { return !this.state.selectedTags.find(t => { return t._id === el._id }) }).map((tag, index) => {
-        return (
-          <li className="list-el" key={tag.name + '2'}>
-            {tag.name}
-            <button className="btn xsm" type="button" onClick={() => this.addTag(index)}>Add</button>
-          </li>
-        );
+      tags: this.state.tags.map((tag, index) => {
+        if (!this.state.selectedTags.find(t => { return t._id === tag._id })) {
+          return (
+            <li className="list-el" key={tag.name + '2'}>
+              {tag.name}
+              <button className="btn xsm" type="button" onClick={() => this.addTag(index)}>Add</button>
+            </li>
+          );
+        } else {
+          return null;
+        }
       })
     };
-    console.log('generating t')
     return tagsToGenerate;
   }
 
   removeTag = (index) => {
-    const newTags = this.state.selectedTags.filter(t => { t._id !== this.state.tags[index]._id });
+    const newTags = this.state.selectedTags.filter((t, i) => { return index !== i });
     this.setState({ selectedTags: newTags });
   } 
 
@@ -76,9 +81,23 @@ class CallingModal extends React.Component {
       this.clearState();
       this.props.editClear(false);
     }
+    const modalConfirm = (
+      <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.startCall')} >
+        <button id="modalAnswerButton" onClick={() => { props.socket.emit('create_incoming_call', { topic: this.state.topic || 'No topic', messageUser: props.messageUser, tags: this.state.selectedTags, caller: this.props.authUser._id }); this.editConfirmed(true); }} >
+          <i className="border" /> 
+        </button>
+      </Tooltip>
+    );
+    const modalCancel = (
+      <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
+        <button id="modalRejectButton" onClick={() => {this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.talk.messageUser }) : this.endCalling() }}>
+          <i className="border" />
+        </button>
+      </Tooltip>
+    );
     const tags = this.generateTags();
     return (
-      <Modal modalHeader={'Incoming call'} calling={true} onCancelModal={() => {this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.talk.messageUser }) : this.endCalling() }} onConfirmModal={() => { props.socket.emit('create_incoming_call', { topic: this.state.topic || 'No topic', messageUser: props.messageUser, tags: this.state.selectedTags.map(tag => tag._id)}); this.editConfirmed(true); }} opened={props.opened}>
+      <Modal modalHeader={'Outcoming call'} calling={true} cancelButton={modalCancel} confirmButton={modalConfirm} opened={props.opened}>
         {this.state.confirmed ? (<React.Fragment>Calling, topic: {this.state.topic || 'No topic'}</React.Fragment>) :
           <React.Fragment>
             Enter tags of the talk
@@ -109,5 +128,5 @@ const mapDispatchToProps = dispatch => {
     })
   };
 }
-export default connect(mapStateToProps, mapDispatchToProps)(CallingModal);
+export default translate()(connect(mapStateToProps, mapDispatchToProps)(CallingModal));
 /* eslint-enable */

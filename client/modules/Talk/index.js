@@ -188,11 +188,16 @@ class Talk extends Component {
   clearCall = () => {
     this.state.localStream.getTracks().forEach(track => track.stop());
     this.props.clearTalk();
-    history.push('/');
+    if (this.props.authUser._id === this.props.talk.caller) {
+      history.push('/');
+    } else {
+      history.push('/surveys');
+    }
   }
   endCall = () => {
     this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));
     this.props.p2p.destroy();
+    this.props.socket.emit('finish_call_client', { talk: this.props.talk });
     this.clearCall();
   }
   render() {
