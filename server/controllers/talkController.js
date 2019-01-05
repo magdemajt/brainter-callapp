@@ -13,7 +13,8 @@ const { addUserTags } = require('./usersController');
 exports.createNewCall = (io, socket, data) => {
   const talk = new Talk({
     topic: data.topic,
-    messageUser: data.messageUser
+    messageUser: data.messageUser,
+    tags: data.tags
   });
   talk.save();
   MessageUser.findById(data.messageUser).then((mUser) => {

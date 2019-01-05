@@ -8,6 +8,7 @@ import SetEmail from './components/SetEmail';
 import { checkIfEmailAvailable } from '../../axiosWrappers/login';
 import { validateEmail, validatePassword } from '../../components/validation';
 import SetPass from './components/SetPass';
+import { getPermission } from '../../axiosWrappers/admin';
 // Import Style
 
 
@@ -32,17 +33,12 @@ class Settings extends Component {
     this.props.socket.on('edited', data => {
       this.props.initUser(data.user);
     })
-    getTags((res) => {
-      if (res.data) {
-        this.props.initTags(res.data);
-        this.setState({ filteredTags: res.data });
+    getPermission((res) => {
+      const permission = Number(res.data);
+      if(permission > 0 && permission <= 3) {
+        this.props.initPermission(permission);
       }
-    })
-    getUsers((res) => {
-      if (res.data) {
-        this.props.initUsers(res.data);
-      }
-    })
+    }, (err) => {});
   }
 
   changeActive = (newActive) => {
@@ -109,7 +105,7 @@ class Settings extends Component {
         <div className="card">
           {view}
         </div>
-        <Toolbar changeSettingPage={this.changeActive} />
+        <Toolbar changeSettingPage={this.changeActive} permission={this.props.permission}/>
       </div>
     );
   }
@@ -123,6 +119,7 @@ const mapStateToProps = (state) => {
     tags: state.tags.tags,
     selectedTags: state.search.selectedTags,
     socket: state.io.socket,
+    permission: state.admin.permission
   };
 };
 /* eslint-disable */
@@ -139,6 +136,10 @@ const mapDispatchToProps = (dispatch) => {
     initTags: (tags) => dispatch({
       type: 'INIT_TAGS',
       tags
+    }),
+    initPermission: (permission) => dispatch({
+      type: 'INIT_PERMISSION',
+      permission
     })
   };
 };

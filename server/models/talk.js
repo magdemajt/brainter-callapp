@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const talkSchema = new Schema({
   topic: { type: 'String', required: true },
   date: { type: 'Date', default: Date.now },
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
   pointsFor: { type: 'Number', required: true, default: 10 },
   messageUser: [{ type: Schema.Types.ObjectId, ref: 'MessageUser' }],
   createdAt: { type: 'Date', default: Date.now, required: true },

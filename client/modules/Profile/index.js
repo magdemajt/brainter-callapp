@@ -18,15 +18,15 @@ class Profile extends Component {
     super(props);
     this.state = {
       editing: false,
-      user: this.props.user,
-      filteredTags: this.props.tags,
+      user: {...this.props.user},
+      filteredTags: [...this.props.tags],
       filter: ''
     };
   }
 
   componentDidMount() {
     getTags((res) => {
-      if (res.data) {
+      if (res.data && this.props.tags.length === 0) {
         this.props.initTags(res.data);
         this.setState({ filteredTags: res.data });
       }
@@ -74,6 +74,7 @@ class Profile extends Component {
       photo: this.state.user.photo,
     }, (res) => {
       this.props.initUser(this.state.user)
+      
       this.setState({editing: false});
     })
   }

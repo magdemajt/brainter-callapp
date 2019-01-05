@@ -1,5 +1,6 @@
 const path = require('path');
 const User = require('../models/user');
+const Admin = require('../models/admin');
 const errors = require('./errorHandle/errorStatusCodes');
 const handleStatusCodes = require('./errorHandle/errorStatuses');
 const UserAction = require('../models/userAction');

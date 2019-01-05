@@ -8,6 +8,7 @@ import CallingModal from '../CallingModal';
 import history from '../../history';
 import { translate } from 'react-polyglot';
 import Tooltip from 'rc-tooltip';
+import { axiosPost } from '../../axiosWrappers';
 // Import Style
 
 
@@ -19,9 +20,14 @@ class NavMenu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      openedTalk: false
+      clear: false,
     };
   }
+
+  editClear = (clear) => {
+    this.setState({clear});
+  }
+
   setListeners = () => {
     this.props.socket.on('message_users', (messageUsers) => {
       this.props.initMessageUsers(messageUsers);
@@ -29,15 +35,15 @@ class NavMenu extends React.Component {
     this.props.socket.on('created_talk', (data) => {
       const talk = data.talk;
       this.props.initCurrentTalk(talk, true);
-      this.setState({openedTalk: true});
     });
     this.props.socket.on('abort_call', () => {
       this.props.clearCurrentTalk();
-      this.setState({openedTalk: false});
+      this.editClear(true);
     });
     this.props.socket.on('answer_call', () => {
       this.props.toggleSeen();
-      this.setState({openedTalk: false});
+      this.props.startCalling(null);
+      this.editClear(true);
       history.push('/talk');
     });
     this.props.socket.on('message_user_new', (data) => {
@@ -73,6 +79,10 @@ class NavMenu extends React.Component {
   }
   componentDidMount() {
     const token = cookie.get('token');
+    const redirect = cookie.get('redirect');
+    if (redirect) {
+      history.push(redirect);
+    }
     if (token) {
       this.props.initToggleUser(token);
       this.setupListenersAndEverything();
@@ -118,7 +128,7 @@ class NavMenu extends React.Component {
             </Tooltip>
           </nav>
           <IncomingCallModal opened={!this.props.seen && this.props.talk.hasOwnProperty('_id')} />
-          <CallingModal opened={this.state.openedTalk} />
+          <CallingModal clearState={this.state.clear} editClear={this.editClear} opened={this.props.talkMu !== null} messageUser={this.props.talkMu} />
         </React.Fragment>
       );
     }
@@ -133,6 +143,7 @@ const mapStateToProps = state => ({
   socket: state.io.socket,
   seen: state.talk.seen,
   talk: state.talk.talk,
+  talkMu: state.talk.messageUser,
   p2p: state.io.p2p,
   messageUsers: state.messages.messageUsers,
   messageUser: state.messages.user
@@ -190,6 +201,10 @@ const mapDispatchToProps = (dispatch) => {
       type: 'INIT_TALK', 
       talk,
       seen
+    }),
+    startCalling: (messageUser) => dispatch({
+      type: 'START_CALLING',
+      messageUser
     }),
     clearCurrentTalk: () => dispatch({
       type: 'CLEAR_TALK'

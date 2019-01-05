@@ -2,6 +2,17 @@
     font-size: 1.6rem;
     color: white;
     width: 15rem;
+    &.sm {
+      height: 3rem;
+      min-height: 3rem;
+      width: 10rem;  
+    }
+    &.xsm {
+        height: 2rem;
+        min-height: 2rem;
+        width: 8rem;
+        margin: .4rem;
+    }
     min-height: 4rem;
     height: 4rem;
     margin: $default-margin 0;

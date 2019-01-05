@@ -20,5 +20,9 @@
     padding: 3rem 1rem;
     border: solid 1px $border-default;
     border-radius: .5rem;
+    h3 {
+      overflow-y: scroll;
+      max-height: 10rem;
+    }
   }
 }

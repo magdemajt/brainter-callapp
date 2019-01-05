@@ -22,7 +22,7 @@ exports.addTag = (req, res) => {
     aliases: req.body.aliases || []
   });
   tag.save().then(() => {
-    res.sendStatus(200);
+    res.send(true);
   }).catch(err => {
     console.log(err);
     res.sendStatus(500);

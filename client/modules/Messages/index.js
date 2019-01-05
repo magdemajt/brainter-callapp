@@ -42,7 +42,7 @@ class Messages extends Component {
     if (this.props.match.params.id !== '0') {
       const chosenUser = this.openMessagesIfRouteUser();
       if (this.props.match.params.talking === 'true') {
-        this.props.socket.emit('create_incoming_call', { topic: 'No topic', messageUser: chosenUser._id});
+        this.props.startCalling(chosenUser._id);
       } else {
         this.onSelect(chosenUser);
       }
@@ -103,6 +103,10 @@ const mapDispatchToProps = (dispatch) => {
       type: 'INIT_TALK', 
       talk,
       seen
+    }),
+    startCalling: (messageUser) => dispatch({
+      type: 'START_CALLING',
+      messageUser
     }),
     clearCurrentTalk: () => dispatch({
       type: 'CLEAR_TALK'

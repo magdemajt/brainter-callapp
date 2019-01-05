@@ -15,7 +15,8 @@ class VideoPlayer extends React.Component {
     this.remoteVideo = React.createRef();
     this.state = {
       muted: false,
-      videoMuted: false
+      videoMuted: false,
+      showControls: false
     };
   }
   muteLocal = () => {
@@ -56,10 +57,10 @@ class VideoPlayer extends React.Component {
 
   render() {
     return (
-      <div id="talkDiv">
-        <video id="localVideo" ref={this.localVideo} autoPlay controls={false} style={{ width: '300px', height: '400px' }} muted onVolumeChange={this.muteLocal} />
-        <video id="remoteVideo" ref={this.remoteVideo} autoPlay controls={false} style={{ width: '600px', height: '800px' }} />
-        <div id="buttonsDiv">
+      <div id="talkDiv" onMouseEnter={() => { this.setState({ showControls: true }); }} onMouseLeave={() => { this.setState({ showControls: false }); }}>
+        <video id="localVideo" ref={this.localVideo} autoPlay controls={false} muted onVolumeChange={this.muteLocal} />
+        <video id="remoteVideo" ref={this.remoteVideo} autoPlay controls={false} />
+        {this.state.showControls ? <div id="buttonsDiv">
           <Tooltip trigger={['hover']} placement="top" overlay={this.props.t('talk.disconnect')}>
             <button id="disconnectButton" onClick={this.props.onEndCall} />
           </Tooltip>
@@ -69,7 +70,7 @@ class VideoPlayer extends React.Component {
           <Tooltip trigger={['hover']} placement="top" overlay={this.state.videoMuted ? this.props.t('talk.video') : this.props.t('talk.novideo')}>
             <button id={this.state.videoMuted ? 'novideoButton' : 'videoButton'} onClick={this.muteOrUnmuteVideo} />
           </Tooltip>
-        </div>
+        </div> : null}
       </div>
     );
   }

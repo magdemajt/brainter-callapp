@@ -1,7 +1,7 @@
 {
   "name": "brainter",
   "version": "1.0.0",
-  "description": "This is brainte project to put on server",
+  "description": "This is brainter project to put on server",
   "main": "app.js",
   "scripts": {
     "build": "webpack --mode production",
@@ -23,7 +23,6 @@
     "express": "^4.16.3",
     "form-data": "^2.3.2",
     "history": "^4.7.2",
-    "immutable": "^3.8.2",
     "mongoose": "^5.2.8",
     "multer": "^1.3.1",
     "node-polyglot": "^2.3.0",
@@ -39,7 +38,6 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-router-redux": "^4.0.8",
-    "react-translate-component": "^0.15.1",
     "redux": "^4.0.0",
     "sass": "^1.11.0",
     "simple-peer": "^9.1.2",
