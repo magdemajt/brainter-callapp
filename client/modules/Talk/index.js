@@ -31,21 +31,22 @@ class Talk extends Component {
 
     if (!this.props.talk.hasOwnProperty('_id')) {
       history.push('/');
-    }
-    const constraints = {
-      video: true,
-      audio: true
-    };
-    if (this.props.creator) {
-      this.props.socket.on('got_receiver_stream', () => {
-        if (this.state.leftToConnect === 1) {
-          this.getMediaCreator(constraints, false);
-        } else {
-          this.setState({ leftToConnect: this.state.leftToConnect - 1 });
-        }
-      });
     } else {
-      this.getMedia(constraints, false);
+      const constraints = {
+        video: true,
+        audio: true
+      };
+      if (this.props.creator) {
+        this.props.socket.on('got_receiver_stream', () => {
+          if (this.state.leftToConnect === 1) {
+            this.getMediaCreator(constraints, false);
+          } else {
+            this.setState({ leftToConnect: this.state.leftToConnect - 1 });
+          }
+        });
+      } else {
+        this.getMedia(constraints, false);
+      }
     }
   }
   /* eslint-disable */
@@ -187,12 +188,12 @@ class Talk extends Component {
 
   clearCall = () => {
     this.state.localStream.getTracks().forEach(track => track.stop());
-    this.props.clearTalk();
-    if (this.props.authUser._id === this.props.talk.caller) {
-      history.push('/');
-    } else {
-      history.push('/surveys');
+    let destination = '/'; // calabria
+    if (this.props.authUser._id !== this.props.talk.caller && this.props.talk.createdAt - Date.now() > 1000 * 60 * 30) {
+      destination = '/surveys'
     }
+    this.props.clearTalk();
+    history.push(destination);
   }
   endCall = () => {
     this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));

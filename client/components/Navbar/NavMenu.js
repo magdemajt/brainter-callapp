@@ -8,6 +8,7 @@ import CallingModal from '../CallingModal';
 import history from '../../history';
 import { translate } from 'react-polyglot';
 import Tooltip from 'rc-tooltip';
+import '../../sounds/calling.mp3';
 import { axiosPost } from '../../axiosWrappers';
 // Import Style
 
@@ -34,6 +35,7 @@ class NavMenu extends React.Component {
     });
     this.props.socket.on('created_talk', (data) => {
       const talk = data.talk;
+      talk.tags = data.tags;
       this.props.initCurrentTalk(talk, true);
     });
     this.props.socket.on('abort_call', () => {
@@ -52,18 +54,25 @@ class NavMenu extends React.Component {
     })
     this.props.socket.on('incoming_call', (data) => {
       const talk = data.talk;
+      talk.tags = data.tags;
       if (!this.props.talk.hasOwnProperty('_id')) {
         this.props.socket.emit('incoming_call', { messageUser: talk.messageUser });
         this.props.initCurrentTalk(talk, false);
-        let audio = new Audio('../../sounds/calling.mp3');
-        let count = 0;
-        let timeout = setInterval((count, audio) => {
-          if(count === 10) {
-            clearInterval(this);
-          }
-          audio.play();
-          count++;
-        }, 7000, count, audio);
+        try {
+          let audio = new Audio('../../sounds/calling.mp3');
+          let count = 0;
+          let timeout = setInterval(() => {
+            if(count === 6) {
+              clearInterval(timeout);
+              this.props.socket.emit('abort_call_client', { messageUser: talk.messageUser })
+            }
+            audio.play();
+            count++;
+          }, 7000);
+        }
+        catch (err) {
+          
+        }
       }
     });
     this.props.socket.on('message', (message) => {
@@ -80,27 +89,28 @@ class NavMenu extends React.Component {
   componentDidMount() {
     const token = cookie.get('token');
     const redirect = cookie.get('redirect');
-    if (redirect) {
-      history.push(redirect);
-    }
     if (token) {
       this.props.initToggleUser(token);
-      this.setupListenersAndEverything();
+      this.setupListenersAndEverything(redirect);
     } else {
       window.addEventListener('setupToken', this.tokenEventListener);
     }
+    
   }
   tokenEventListener = (e) => {
     this.setupListenersAndEverything();
     window.removeEventListener('setupToken', this.tokenEventListener);
   }
 
-  setupListenersAndEverything () {
+  setupListenersAndEverything (redirect) {
       getAuth((res) => {
         this.props.initSocket(res.data.token);
         this.props.initUser(res.data);
         this.setListeners();
         this.props.socket.emit('get_message_users', { part: 0 });
+        if (redirect) {
+          history.push(redirect);
+        }
       }, (err) => {
         this.props.initToggleUser(null);
       });

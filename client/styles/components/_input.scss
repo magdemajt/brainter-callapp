@@ -13,7 +13,10 @@
   }
   &.nowidth {
     width: unset;
-  } 
+  }
+  &.medium {
+    width: 50%;
+  }
 }
 #message-input {
   min-width: 40rem;

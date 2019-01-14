@@ -4,7 +4,8 @@ const initialState = {
   talk: {},
   seen: false,
   messageUser: null,
-  creator: false
+  creator: false,
+  tagModal: false
 };
 
 const talkReducer = (oldState = initialState, action) => {
@@ -21,6 +22,12 @@ const talkReducer = (oldState = initialState, action) => {
     }
     case 'START_CALLING': {
       return Object.assign({}, state, { messageUser: action.messageUser });
+    }
+    case 'OPEN_TAG_TALK': {
+      return Object.assign({}, state, { tagModal: true });
+    }
+    case 'CLOSE_TAG_TALK': {
+      return Object.assign({}, state, { tagModal: false });
     }
     default:
       return state;

@@ -21,7 +21,7 @@ exports.createNewCall = (io, socket, data) => {
   MessageUser.findById(data.messageUser).then((mUser) => {
     mUser.participants.forEach((part) => {
       if (part.toString() !== socket.authUser._id.toString()) {
-        io.to(`room_${part}`).emit('incoming_call', { talk: { ...talk, tags: data.tags } });
+        io.to(`room_${part}`).emit('incoming_call', { talk, tags: data.tags });
       }
     });
   }).catch((err) => {
@@ -32,14 +32,18 @@ exports.createNewCall = (io, socket, data) => {
 };
 
 exports.finishCall = (io, socket, data) => {
-  Talk.findById(data.talk._id).populate('messageUser').then(talk => {
-    const surveys = talk.messageUser.participants.filter(part => {
-      return part !== talk.caller;
+  Talk.findOne({ _id: data.talk._id }).populate('messageUser').then(talk => {
+    const surveys = talk.messageUser.participants.map(part => {
+      if(part.toString() !== talk.caller.toString()) {
+        return { respondent: part };
+      }
     });
     talk.finishedAt = Date.now();
-    talk.surveys = surveys;
-    talk.save();
-  });
+    if (talk.finishedAt - talk.createdAt > 1000 * 60 * 30) {
+      talk.surveys = surveys;
+    }
+    talk.save().catch(err => console.log(err));
+  }).catch(err => console.log(err));
 };
 
 exports.userSurveys = (io, socket, data) => {
@@ -49,9 +53,9 @@ exports.userSurveys = (io, socket, data) => {
 };
 
 exports.finishSurvey = (io, socket, data) => {
-  Talk.update({ _id: data.talk._id }, { surveys: { $pull: { respondent: socket.authUser._id }, $push: data.talk.surveys[0] } }).then(() => {
-
-  });
+  Talk.updateOne({ _id: data.talk._id, 'surveys._id': data.talk.surveys[0]._id }, { $set: { 'surveys.$': data.talk.surveys[0] } })
+    .then(() => {})
+    .catch(err => console.log(err));
 };
 
 exports.abortCall = (io, socket, data) => {

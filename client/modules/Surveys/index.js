@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { addAuthTags, deleteAuthTags, updateWithTags, updateAuthWithTags, getTags, updatePhoto, getUsers, getUsersByTags, getUser, updateEmail, updatePassword } from '../../axiosWrappers/users';
-import history from '../../history';
-import settingEnum from './settingEnum';
-import Toolbar from './components/Toolbar';
-import SetEmail from './components/SetEmail';
-import { checkIfEmailAvailable } from '../../axiosWrappers/login';
-import { validateEmail, validatePassword } from '../../components/validation';
-import SetPass from './components/SetPass';
-import { getPermission } from '../../axiosWrappers/admin';
 import SurveyInputs from './components/SurveyInputs';
 import { translate } from 'react-polyglot';
+import SurveySelection from './components/SurveySelection';
 // Import Style
 
 
@@ -18,7 +10,7 @@ import { translate } from 'react-polyglot';
 
 // Import Actions
 
-class Settings extends Component {
+class Surveys extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -93,29 +85,35 @@ class Settings extends Component {
 
 
   render() {
-    return (
-      <div className="container fluid offset-15 flex ml-1-5">
-        <div className="card">
-          <div className="col-3">
-            <SurveySelection edited={this.state.edited} talks={this.state.talks} currentId={this.state.selectedTalk._id} onChangeCurrent={this.changeSelectedTalk} />
-          </div>
-          <div className="col-6 ml-2">
-            {this.state.edited ? this.props.t('survey.info') : null}
-            <SurveyInputs knowledge={this.state.selectedTalk.surveys[0].knowledge}
-              teaching={this.state.selectedTalk.surveys[0].teaching}
-              culture={this.state.selectedTalk.surveys[0].culture}
-              lesson={this.state.selectedTalk.surveys[0].lesson}
-              comment={this.state.selectedTalk.surveys[0].comment}
-              onChangeKnowledge={this.changeKnowledge}
-              onChangeTeaching={this.changeTeaching}
-              onChangeCulture={this.changeCulture}
-              onChangeLesson={this.changeLesson}
-              onChangeComment={this.changeComment}
-            />
+    if (this.state.talks.length > 0) {
+      return (
+        <div className="container fluid offset-15 height-60 flex ml-1-5">
+          <div className="card font-16">
+            <div className="col-3">
+              <SurveySelection edited={this.state.edited} talks={this.state.talks} currentId={this.state.selectedTalk._id} onChangeCurrent={this.changeSelectedTalk} />
+            </div>
+            <div className="col-6 ml-2">
+              {this.state.edited ? this.props.t('survey.info') : null}
+              <SurveyInputs knowledge={this.state.selectedTalk.surveys[0].knowledge}
+                teaching={this.state.selectedTalk.surveys[0].teaching}
+                culture={this.state.selectedTalk.surveys[0].culture}
+                lesson={this.state.selectedTalk.surveys[0].lesson}
+                comment={this.state.selectedTalk.surveys[0].comment}
+                onChangeKnowledge={this.changeKnowledge}
+                onChangeTeaching={this.changeTeaching}
+                onChangeCulture={this.changeCulture}
+                onChangeLesson={this.changeLesson}
+                onChangeComment={this.changeComment}
+              />
+            </div>
+            <div className="row justify-center">
+              <button type="button" onClick={this.finishSurvey} className={this.state.selectedTalk._id !== undefined ? 'btn' : 'btn disabled'}>Confirm</button>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
+    return null;
   }
 }
 
@@ -127,7 +125,6 @@ const mapStateToProps = (state) => {
     tags: state.tags.tags,
     selectedTags: state.search.selectedTags,
     socket: state.io.socket,
-    permission: state.admin.permission
   };
 };
 /* eslint-disable */
@@ -153,4 +150,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 /* eslint-enable */
 
-export default translate()(connect(mapStateToProps, mapDispatchToProps)(Settings));
+export default translate()(connect(mapStateToProps, mapDispatchToProps)(Surveys));

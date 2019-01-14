@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { translate } from 'react-polyglot';
 
 const UserSelection = ({
-  messageUsers, onSelect, authUser, userM
+  messageUsers, onSelect, authUser, userM, t
 }) => {
   const names = (participants) => {
     let text = '';
     participants.filter(par => par._id !== authUser._id).forEach((user, index, array) => {
       text += user.name + (array.length - 1 !== index ? ', ' : '');
     });
+    if (text === '') {
+      text = t('messages.noUser');
+    }
     return text;
   };
   const users = messageUsers.map(messageUser => (
@@ -30,4 +34,4 @@ const mapStateToProps = state => ({
   userM: state.messages.user,
   authUser: state.userData.user
 });
-export default connect(mapStateToProps)(UserSelection);
+export default translate()(connect(mapStateToProps)(UserSelection));

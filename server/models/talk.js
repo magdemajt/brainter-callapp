@@ -17,21 +17,23 @@ const talkSchema = new Schema({
     comment: { type: 'String' }
   }],
   caller: { type: Schema.Types.ObjectId, ref: 'User' },
-  messageUser: [{ type: Schema.Types.ObjectId, ref: 'MessageUser' }],
+  messageUser: { type: Schema.Types.ObjectId, ref: 'MessageUser' },
   finishedAt: { type: 'Date' },
   createdAt: { type: 'Date', default: Date.now, required: true },
 });
 
 talkSchema.statics.getSurveysByUser = function (userId, callback) {
-  this.find({ surveys: { respondent: userId, knowledge: { $ne: -1 } } }).populate({ path: 'caller', select: 'name' }).then(talks => {
+  this.find({ $and: [ { 'surveys.respondent': userId }, { 'surveys.knowledge': -1 }] }).populate({ path: 'caller', select: 'name' })
+  .lean()
+  .then(talks => {
     const sendTalks = talks.map(talk => {
       const surveys = talk.surveys.filter(survey => {
-        return survey.respondent === userId;
+        return survey !== null && survey.respondent.toString() === userId.toString();
       });
       return { ...talk, surveys };
     });
     callback(sendTalks);
-  })
+  }).catch(err => console.log(err));
 }
 
 module.exports = mongoose.model('Talk', talkSchema);

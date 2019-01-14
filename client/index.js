@@ -42,6 +42,10 @@ const phrases = {
     comment: 'Here enter your comment...',
 
   },
+  messages: {
+    noUser: 'User was deleted',
+    messageInput: 'Enter text of your message...'
+  },
   user: {
     sendmsg: 'Send message'
   }

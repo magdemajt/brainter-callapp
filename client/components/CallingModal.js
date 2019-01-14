@@ -17,7 +17,7 @@ class CallingModal extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    if (this.props.authUser !== undefined && this.props.authUser.tags !== undefined && this.props.authUser.tags.length > 0 && this.state.tags.length === 0) {
+    if (this.props.authUser !== undefined && this.props.authUser.tags !== undefined && this.props.authUser.tags.length > 0 && (prevProps.authUser === undefined || prevProps.authUser.tags === undefined || (prevProps.authUser.tags.length !== this.props.authUser.tags.length))) {
       this.setState({ tags: this.props.authUser.tags });
     }
   }
@@ -50,7 +50,14 @@ class CallingModal extends React.Component {
         } else {
           return null;
         }
-      })
+      }),
+      tagsNoButton: this.state.selectedTags.map((tag, index) => {
+        return (
+          <li className="list-el" key={tag.name + '3'}>
+            {tag.name}
+          </li>
+        );
+      }),
     };
     return tagsToGenerate;
   }
@@ -68,7 +75,7 @@ class CallingModal extends React.Component {
     this.setState({ confirmed });
   }
   clearState = () => {
-    this.setState({ topic: '', confirmed: false });
+    this.setState({ topic: '', confirmed: false, selectedTags: [] });
   }
   endCalling = () => {
     this.clearState();
@@ -90,15 +97,21 @@ class CallingModal extends React.Component {
     );
     const modalCancel = (
       <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
-        <button id="modalRejectButton" onClick={() => {this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.talk.messageUser }) : this.endCalling() }}>
+        <button id="modalRejectButton" onClick={() => { this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.messageUser }) : this.endCalling() }}>
           <i className="border" />
         </button>
       </Tooltip>
     );
     const tags = this.generateTags();
     return (
-      <Modal modalHeader={'Outcoming call'} calling={true} cancelButton={modalCancel} confirmButton={modalConfirm} opened={props.opened}>
-        {this.state.confirmed ? (<React.Fragment>Calling, topic: {this.state.topic || 'No topic'}</React.Fragment>) :
+      <Modal modalHeader={'Outcoming call'} calling={true} cancelButton={modalCancel} confirmButton={!this.state.confirmed ? modalConfirm: null} opened={props.opened}>
+        {this.state.confirmed ? 
+        ( <React.Fragment>
+            Calling, topic: {this.state.topic || 'No topic'}
+            <ul className="list" style={{maxHeight: '6.5rem'}}>
+              {tags.tagsNoButton}
+            </ul>
+          </React.Fragment>) :
           <React.Fragment>
             Enter tags of the talk
             <ul className="list" style={{maxHeight: '6.5rem'}}>

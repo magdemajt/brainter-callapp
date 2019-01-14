@@ -36,8 +36,11 @@ app.use('/api', loginRouter);
 app.use('/api', tagRouter);
 app.use('/api', userRouter);
 app.use('/api', adminRouter);
+app.use('/messages/:id/true', (req, res) => {
+  res.redirect(`/messages/${req.params.id}/false`);
+});
 app.use('*', (req, res) => {
-  res.cookie('redirect', req.originalUrl, { maxAge: 5000 });
+  res.cookie('redirect', req.originalUrl, { maxAge: 3000 });
   res.redirect('/');
 });
 // http.listen(ServerAddress.apiPort, ServerAddress.server || '127.0.0.1', () => console.log('Listening on port 8080!'));

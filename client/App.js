@@ -16,6 +16,7 @@ import Messages from './modules/Messages';
 import Talk from './modules/Talk';
 import Settings from './modules/Settings';
 import Admin from './modules/Admin';
+import Surveys from './modules/Surveys';
 
 export default class App extends Component {
   constructor(props) {
@@ -39,6 +40,7 @@ export default class App extends Component {
           <NoRegisterRoute path="/login" component={Login} />
           <NoRegisterRoute path="/register" component={Register} />
           <PrivateRoute path="/admin" component={Admin} />
+          <PrivateRoute path="/surveys" component={Surveys} />
         </Switch>
       </div>
     );

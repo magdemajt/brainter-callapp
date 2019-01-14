@@ -33,7 +33,6 @@ exports.getUsers = (req, res) => {
 exports.getUsersByTags = (req, res) => {
   const tags = req.body.tags.map(tag => tag._id);
   User.findByTags(tags, (users) => {
-    console.log(users);
     if (users.length > 0) {
       res.send(users[Math.floor(Math.random() * users.length)]);
     } else {

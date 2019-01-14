@@ -15,7 +15,8 @@ class Users extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      opened: ''
+      opened: '',
+      topic: ''
     };
   }
 
@@ -45,7 +46,13 @@ class Users extends Component {
     this.props.initUser(this.props.users[indexUser]);
   }
 
+  changeTopic = (topic) => {
+    this.setState({ topic: topic.trim() });
+  }
+
   searchByTags = () => {
+    this.props.socket.emit('search_talk_tags', { selectedTags: this.props.selectedTags });
+    this.props.openTalkTagModal();
     getUsersByTags(this.props.selectedTags, (res) => {
       this.props.initUser(res.data);
       this.selectUserToTalk(res.data._id);
@@ -98,7 +105,7 @@ class Users extends Component {
           <button className="btn huge" onClick={() => this.setState({opened: '2'})}>
             Search user to talk to
           </button>
-          {this.state.opened === '2' ? <SearchUserByTags search={this.searchByTags} />: null}
+          {this.state.opened === '2' ? <SearchUserByTags search={this.searchByTags} changeTopic={this.changeTopic} />: null}
         </div>
       </div>
     );
@@ -129,6 +136,9 @@ const mapDispatchToProps = (dispatch) => {
     initTags: (tags) => dispatch({
       type: 'INIT_TAGS',
       tags
+    }),
+    openTalkTagModal: () => dispatch({
+      type: 'OPEN_TAG_TALK'
     })
   };
 };

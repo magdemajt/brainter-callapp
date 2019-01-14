@@ -42,25 +42,22 @@ class VideoPlayer extends React.Component {
     const { localStream, remoteStream } = this.props;
     try {
       this.localVideo.current.srcObject = localStream;
-      console.log('Niby działa localStream');
     } catch (error) {
-      console.log('Tutaj coś!');
       this.localVideo.src = localStream !== null ? URL.createObjectURL(localStream) : null;
     }
     try {
       this.remoteVideo.current.srcObject = remoteStream;
     } catch (error) {
-      console.log('Tutaj coś remote');
       this.remoteVideo.src = remoteStream !== null ? URL.createObjectURL(remoteStream) : null;
     }
   }
 
   render() {
     return (
-      <div id="talkDiv" onMouseEnter={() => { this.setState({ showControls: true }); }} onMouseLeave={() => { this.setState({ showControls: false }); }}>
+      <div id="talkDiv">
         <video id="localVideo" ref={this.localVideo} autoPlay controls={false} muted onVolumeChange={this.muteLocal} />
         <video id="remoteVideo" ref={this.remoteVideo} autoPlay controls={false} />
-        {this.state.showControls ? <div id="buttonsDiv">
+        <div id="buttonsDiv">
           <Tooltip trigger={['hover']} placement="top" overlay={this.props.t('talk.disconnect')}>
             <button id="disconnectButton" onClick={this.props.onEndCall} />
           </Tooltip>
@@ -70,7 +67,7 @@ class VideoPlayer extends React.Component {
           <Tooltip trigger={['hover']} placement="top" overlay={this.state.videoMuted ? this.props.t('talk.video') : this.props.t('talk.novideo')}>
             <button id={this.state.videoMuted ? 'novideoButton' : 'videoButton'} onClick={this.muteOrUnmuteVideo} />
           </Tooltip>
-        </div> : null}
+        </div>
       </div>
     );
   }
