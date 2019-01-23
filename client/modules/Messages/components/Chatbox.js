@@ -84,7 +84,7 @@ class Chatbox extends Component {
              : null}
             {messages}
           </ul>
-          <ChatInput messageText={this.state.messageText} send={this.send} onEdit={this.onEdit} />
+          <ChatInput disabled={this.props.disabledInput} messageText={this.state.messageText} send={this.send} onEdit={this.onEdit} />
         </React.Fragment>
       );
     } else {

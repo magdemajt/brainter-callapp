@@ -13,6 +13,11 @@ const {
   finishSurvey
 } = require('../controllers/talkController');
 const {
+  searchTeacher,
+  searchTalks,
+  selectTalk
+} = require('../controllers/lessonController');
+const {
   createNewMessage,
   getMessages,
   getMessageUsers,
@@ -30,6 +35,9 @@ module.exports = (io) => {
     socket.on('finish_call_client', data => finishCall(io, socket, data));
     socket.on('answer_call_client', data => answerCall(io, socket, data));
     socket.on('get_surveys', data => userSurveys(io, socket, data));
+    socket.on('search_teacher', data => searchTeacher(io, socket, data));
+    socket.on('search_talks', data => searchTalks(io, socket, data));
+    socket.on('select_talk', data => selectTalk(io, socket, data));
     socket.on('finish_survey', data => finishSurvey(io, socket, data));
     socket.on('incoming_call', data => handleIncomingCall(io, socket, data));
     socket.on('create_peer_connection', data => createPeerConnection(io, socket, data));

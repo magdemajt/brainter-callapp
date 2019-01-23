@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 
 // Initial State
 const initialState = {
@@ -5,7 +7,8 @@ const initialState = {
   seen: false,
   messageUser: null,
   creator: false,
-  tagModal: false
+  tagModal: false,
+  teacherTalks: []
 };
 
 const talkReducer = (oldState = initialState, action) => {
@@ -28,6 +31,15 @@ const talkReducer = (oldState = initialState, action) => {
     }
     case 'CLOSE_TAG_TALK': {
       return Object.assign({}, state, { tagModal: false });
+    }
+    case 'INIT_TEACHER_TALKS': {
+      return Object.assign({}, state, { teacherTalks: action.teacherTalks });
+    }
+    case 'REMOVE_TEACHER_TALK': {
+      return Object.assign({}, state, { teacherTalks: _.without(state.teacherTalks, action.teacherTalk) });
+    }
+    case 'INIT_TEACHER_TALK': {
+      return Object.assign({}, state, { talk: action.talk, seen: true, creator: action.creator });
     }
     default:
       return state;

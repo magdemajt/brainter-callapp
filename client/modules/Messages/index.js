@@ -56,7 +56,7 @@ class Messages extends Component {
     return (
       <div className="container fluid center offset-15 height-60">
         <UserSelection onSelect={this.onSelect}/>
-        <Chatbox messages={this.props.user !== undefined && this.props.user.hasOwnProperty('messages') ? this.props.user.messages : []} />
+        <Chatbox disabledInput={this.props.user.participants.filter(part => part !== null).length < 2} messages={this.props.user !== undefined && this.props.user.hasOwnProperty('messages') ? this.props.user.messages : []} />
       </div>
     );
   }

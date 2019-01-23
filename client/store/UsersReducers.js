@@ -4,7 +4,8 @@ const initialState = {
   users: [],
   user: {},
   filter: '',
-  selectedTags: []
+  selectedTags: [],
+  teacherTags: []
 };
 
 const usersReducer = (oldState = initialState, action) => {
@@ -23,7 +24,16 @@ const usersReducer = (oldState = initialState, action) => {
       if (state.selectedTags.includes(action.tag)) {
         return Object.assign({}, state, { selectedTags: state.selectedTags.filter(el => el._id !== action.tag._id) });
       }
-      return Object.assign({}, state, { selectedTags: state.selectedTags.concat(action.tag) });
+      if (state.selectedTags.length < 3) {
+        return Object.assign({}, state, { selectedTags: state.selectedTags.concat(action.tag) });
+      }
+      return state;
+    }
+    case 'SELECT_TEACHER_TAG': {
+      if (state.teacherTags.includes(action.tag)) {
+        return Object.assign({}, state, { teacherTags: state.teacherTags.filter(el => el._id !== action.tag._id) });
+      }
+      return Object.assign({}, state, { teacherTags: state.teacherTags.concat(action.tag) });
     }
     default:
       return state;

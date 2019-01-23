@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
 import { Link } from 'react-router-dom';
 import LoginInput from './login/LoginInput';
 import history from '../../history';
@@ -18,7 +17,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    this.setState({isMounted: true}); // eslint-disable-line
+    this.setState({ isMounted: true }); // eslint-disable-line
   }
 
   render() {

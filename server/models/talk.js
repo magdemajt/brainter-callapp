@@ -17,6 +17,9 @@ const talkSchema = new Schema({
     comment: { type: 'String' }
   }],
   caller: { type: Schema.Types.ObjectId, ref: 'User' },
+  blackboard: {
+    text: 'String'
+  },
   messageUser: { type: Schema.Types.ObjectId, ref: 'MessageUser' },
   finishedAt: { type: 'Date' },
   createdAt: { type: 'Date', default: Date.now, required: true },

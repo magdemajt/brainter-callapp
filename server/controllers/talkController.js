@@ -52,6 +52,10 @@ exports.userSurveys = (io, socket, data) => {
   });
 };
 
+exports.updateText = (io, socket, data) => {
+  Talk.findByIdAndUpdate(data.talk._id, { $set: { 'blackboard.text': data.blackboardText } }).catch(err => {console.log(err)});
+};
+
 exports.finishSurvey = (io, socket, data) => {
   Talk.updateOne({ _id: data.talk._id, 'surveys._id': data.talk.surveys[0]._id }, { $set: { 'surveys.$': data.talk.surveys[0] } })
     .then(() => {})

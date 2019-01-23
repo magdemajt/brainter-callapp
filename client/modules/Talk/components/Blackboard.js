@@ -7,33 +7,16 @@ import { connect } from 'react-redux';
 
 // Import Actions
 
-const SearchUserByName = ({
-  users, viewUserProfile, talkToUser, initFilter, filter, authUser
+const Blackboard = ({
+  text, changeText, caller
 }) => {
-  /* eslint-disable */
-  const mappedUsers = filter != '' ? users
-    .filter(user => user.name.includes(filter))
-    .map((user, index) => (
-      <li key={user._id}>
-          <img src={user.photo.data} alt="Profile image" style={{ width: '20rem' }} />
-          {user.name}
-          {authUser._id !== user._id ? (
-          <React.Fragment>
-            <button onClick={() => talkToUser(user._id, index)}>
-              Talk to user
-            </button>
-          </React.Fragment>) : null }
-            <button onClick={() => viewUserProfile(user._id, index)}>
-              View profile
-            </button>
-        </li>
-    )) : []; /* eslint-enable */
   return (
     <React.Fragment>
-      <input type="text" placeholder="Enter name..." onChange={e => initFilter(e.target.value)} />
-      <ul>
-        {mappedUsers}
-      </ul>
+      {caller ? (
+      <textarea value={text} onChange={changeText} />) : (
+      <h3>
+        {text}
+      </h3>)}
     </React.Fragment>
   );
 };
@@ -55,4 +38,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 /* eslint-enable */
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchUserByName);
+export default connect(mapStateToProps, mapDispatchToProps)(Blackboard);

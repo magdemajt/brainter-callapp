@@ -6,6 +6,10 @@
   max-width: 114rem;
   height: $container-height; 
   position: relative;
+  &.h-30 {
+    height: 30rem;
+    max-height: 30rem;
+  }
   &.fluid {
     max-width: 95vw;
     width: 95vw;
@@ -89,6 +93,11 @@
 .row-5 {
   width: 100%;
   height: 50%;
+  @include display-flex;
+}
+.row-3 {
+  width: 100%;
+  height: 30%;
   @include display-flex;
 }
 .row {

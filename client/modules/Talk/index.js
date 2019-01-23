@@ -20,7 +20,8 @@ class Talk extends Component {
       usedSignaling: false,
       remoteStream: null,
       localAudio: null,
-      leftToConnect: 1
+      leftToConnect: 1,
+      blackboardText: ''
     };
   }
 
@@ -153,6 +154,9 @@ class Talk extends Component {
         case 'END_CALL': 
           this.clearCall();
           break;
+        case 'BLACKBOARD_TEXT':
+          this.setState({ blackboardText: data.blackboardText });
+          break;
       }
       console.log(data);
     });
@@ -199,12 +203,20 @@ class Talk extends Component {
     this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));
     this.props.p2p.destroy();
     this.props.socket.emit('finish_call_client', { talk: this.props.talk });
+    this.props.socket.emit('change_blackboard', { talk: this.props.talk, blackboardText: this.state.blackboardText });
     this.clearCall();
   }
+
+  changeText = (e) => {
+    const blackboardText = e.target.value;
+    this.setState({ blackboardText });
+    this.props.p2p.send(JSON.stringify({ blackboardText, type: 'BLACKBOARD_TEXT' }));
+  }
+
   render() {
     return (
       <div className="container center offset-15">
-        {/* <Blackboard /> */}
+        {/* <Blackboard text={this.state.blackboardText} changeText={this.changeText} caller={this.props.authUser._id === this.props.talk.caller} /> */}
         
         <VideoPlayer localStream={this.state.localStream} remoteStream={this.state.remoteStream} onEndCall={this.endCall} muteLocal={this.muteLocalOutcoming} unmuteLocal={this.unmuteLocalOutcoming} muteVideo={this.muteVideo} unmuteVideo={this.unmuteVideo}/> 
       </div>

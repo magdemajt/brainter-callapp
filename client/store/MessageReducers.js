@@ -2,7 +2,9 @@
 // Initial State
 const initialState = {
   messageUsers: [],
-  user: {}
+  user: {
+    participants: []
+  }
 };
 
 const messageReducers = (oldState = initialState, action) => {

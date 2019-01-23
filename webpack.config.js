@@ -52,6 +52,6 @@ module.exports = {
       template: './public_dev/index.html',
       favicon: './public_dev/favicon.ico'
     }),
-    // new UglifyJsPlugin()
+    new UglifyJsPlugin()
   ]
 };

@@ -8,18 +8,20 @@ import { connect } from 'react-redux';
 // Import Actions
 
 const SearchUserByTags = ({
-  user, search, selectTag, selectedTags, changeTopic
+  user, search, selectTag, selectedTags, changeTopic, tagsFilter, initFilter
 }) => {
   const tagElements = [];
   const searchTags = [];
   user.tags.forEach((tag) => {
     if (selectedTags.filter(el => tag._id === el._id).length === 0) {
-      tagElements.push(
-        <li key={tag._id} className="list-el">
-          {tag.name}
-          <button className="btn xsm" type="button" onClick={() => selectTag(tag)}>Select</button>
-        </li>
-      );
+      if (tag.name.includes(tagsFilter)) {
+        tagElements.push(
+          <li key={tag._id} className="list-el">
+            {tag.name}
+            <button className="btn xsm" type="button" onClick={() => selectTag(tag)}>Select</button>
+          </li>
+        );
+      }
     } else {
       searchTags.push(
         <li key={tag._id} className="list-el">
@@ -31,8 +33,9 @@ const SearchUserByTags = ({
   });
   return (
     <React.Fragment>
-      <input type="text" className="input medium mt-2" placeholder="Enter name..." onChange={e => initFilter(e.target.value)} />
+      <input type="text" className="input medium mt-2" placeholder="Enter name of the tag..." onChange={e => initFilter(e.target.value)} />
       <input type="text" className="input medium" placeholder="Enter topic..." onChange={e => changeTopic(e.target.value)} />
+      Select up to 3 tags
       <ul className="list" style={{ minWidth: '35rem' }}>
         {searchTags}
         {tagElements}

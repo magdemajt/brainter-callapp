@@ -4,6 +4,8 @@ import { updateAuth, addAuthTags, deleteAuthTags, updateWithTags, updateAuthWith
 import SearchUserByName from './components/SearchUserByName';
 import SearchUserByTags from './components/SearchUsersByTags';
 import history from '../../history';
+import _ from 'lodash';
+import TeachByTags from './components/TeachByTags';
 // Import Style
 
 
@@ -16,8 +18,36 @@ class Users extends Component {
     super(props);
     this.state = {
       opened: '',
-      topic: ''
+      topic: '',
+      tagsFilter: '',
+      teacherFilter: '',
+      teacherModal: false
     };
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.socket === undefined && this.props.socket !== undefined) {
+      this.props.socket.removeListener('teacher_talks');
+      this.props.socket.removeListener('selected_talk');
+      this.props.socket.removeListener('starting_teaching');
+      this.props.socket.removeListener('teacher_call');
+      this.props.socket.on('teacher_talks', (data) => {
+        const talks = _.flattenDeep(data.teacherTalks);
+        this.props.initTeacherTalks(talks);
+        this.setState({ teacherModal: true });
+      });
+      this.props.socket.on('selected_talk', (data) => {
+        this.props.removeTeacherTalk(data.teacherTalk);
+      });
+      this.props.socket.on('starting_teaching', (data) => {
+        this.props.initTalk(data.talk, true);
+        history.push('/talk');
+      });
+      this.props.socket.on('teacher_call', (data) => {
+        this.props.initTalk(data.talk, false);
+        history.push('/talk');
+      });
+    }
   }
 
   componentDidMount() {
@@ -51,12 +81,8 @@ class Users extends Component {
   }
 
   searchByTags = () => {
-    this.props.socket.emit('search_talk_tags', { selectedTags: this.props.selectedTags });
+    this.props.socket.emit('search_teacher', { selectedTags: this.props.selectedTags, topic: this.state.topic });
     this.props.openTalkTagModal();
-    getUsersByTags(this.props.selectedTags, (res) => {
-      this.props.initUser(res.data);
-      this.selectUserToTalk(res.data._id);
-    })
   }
 
   viewProfile = (id) => {
@@ -74,10 +100,27 @@ class Users extends Component {
     })
   }
 
+  changeTagsFilter = (tagsFilter) => {
+    this.setState({ tagsFilter });
+  }
+
+  changeTeacherFilter = (teacherFilter) => {
+    this.setState({ teacherFilter });
+  }
+
   talkToUser = (id) => {
     this.selectUser(id);
     this.selectUserToTalk(id);
   }
+
+  searchForTeacherTalks = () => {
+    this.props.socket.emit('search_talks', { selectedTags: this.props.teacherTags })
+  }
+
+  closeTeacherModal = () => {
+    this.setState({ teacherModal: false });
+  }
+
   selectUserToTalk = (id) => {
     if (this.props.authUser._id === id) {
       history.push('/profile')
@@ -103,10 +146,18 @@ class Users extends Component {
         </div>
         <div className={'row-5 justify-center column' + (this.state.opened === '2' ? ' expanded' : '')}>
           <button className="btn huge" onClick={() => this.setState({opened: '2'})}>
-            Search user to talk to
+            Search for teacher
           </button>
-          {this.state.opened === '2' ? <SearchUserByTags search={this.searchByTags} changeTopic={this.changeTopic} />: null}
+          {this.state.opened === '2' ? <SearchUserByTags search={this.searchByTags} changeTopic={this.changeTopic} initFilter={this.changeTagsFilter} tagsFilter={this.state.tagsFilter}/>: null}
         </div>
+        {this.props.authUser !== undefined && this.props.authUser.tags !== undefined && this.props.authUser.tags.filter(tag => tag.level >= 5).length > 0 ?  
+          <div className={'row-5 justify-center column' + (this.state.opened === '3' ? ' expanded' : '')}>
+            <button className="btn huge" onClick={() => this.setState({opened: '3'})}>
+              Teach
+            </button>
+            {this.state.opened === '3' ? <TeachByTags initFilter={this.changeTeacherFilter} tagsFilter={this.state.teacherFilter} search={this.searchForTeacherTalks} /> : null}
+          </div>
+        : null}
       </div>
     );
   }
@@ -119,6 +170,7 @@ const mapStateToProps = (state) => {
     authUser: state.userData.user,
     tags: state.tags.tags,
     selectedTags: state.search.selectedTags,
+    teacherTags: state.search.teacherTags,
     socket: state.io.socket,
   };
 };
@@ -139,6 +191,19 @@ const mapDispatchToProps = (dispatch) => {
     }),
     openTalkTagModal: () => dispatch({
       type: 'OPEN_TAG_TALK'
+    }),
+    initTeacherTalks: (teacherTalks) => dispatch({
+      type: 'INIT_TEACHER_TALKS',
+      teacherTalks
+    }),
+    initTalk: (talk, creator) => dispatch({
+      type: 'INIT_TEACHER_TALK',
+      talk,
+      creator
+    }),
+    removeTeacherTalk: (teacherTalk) => dispatch({
+      type: 'REMOVE_TEACHER_TALK',
+      teacherTalk
     })
   };
 };
