@@ -6,6 +6,8 @@ import SearchUserByTags from './components/SearchUsersByTags';
 import history from '../../history';
 import _ from 'lodash';
 import TeachByTags from './components/TeachByTags';
+import TagTalkModal from '../../components/TagTalkModal';
+import TagTalkTeacherModal from '../../components/TagTalkTeacherModal';
 // Import Style
 
 
@@ -25,26 +27,34 @@ class Users extends Component {
     };
   }
 
+  // clear state in cancelling (teacher talk)
+
   componentDidUpdate (prevProps) {
     if (prevProps.socket === undefined && this.props.socket !== undefined) {
       this.props.socket.removeListener('teacher_talks');
       this.props.socket.removeListener('selected_talk');
       this.props.socket.removeListener('starting_teaching');
       this.props.socket.removeListener('teacher_call');
+      this.props.socket.removeListener('your_teacher_talk');
       this.props.socket.on('teacher_talks', (data) => {
         const talks = _.flattenDeep(data.teacherTalks);
         this.props.initTeacherTalks(talks);
         this.setState({ teacherModal: true });
       });
+      this.props.socket.on('your_teacher_talk', (data) => {
+        this.props.initTeacherTalks([data.talk]);
+      });
       this.props.socket.on('selected_talk', (data) => {
         this.props.removeTeacherTalk(data.teacherTalk);
       });
       this.props.socket.on('starting_teaching', (data) => {
+        this.props.initTeacherTalks([]);
         this.props.initTalk(data.talk, true);
         history.push('/talk');
       });
       this.props.socket.on('teacher_call', (data) => {
         this.props.initTalk(data.talk, false);
+        this.props.initTeacherTalks([]);
         history.push('/talk');
       });
     }
@@ -158,6 +168,8 @@ class Users extends Component {
             {this.state.opened === '3' ? <TeachByTags initFilter={this.changeTeacherFilter} tagsFilter={this.state.teacherFilter} search={this.searchForTeacherTalks} /> : null}
           </div>
         : null}
+        <TagTalkModal opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user._id === this.props.authUser._id} />
+        <TagTalkTeacherModal opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user._id !== this.props.authUser._id} />
       </div>
     );
   }
@@ -169,6 +181,7 @@ const mapStateToProps = (state) => {
     users: state.search.users,
     authUser: state.userData.user,
     tags: state.tags.tags,
+    teacherTalks: state.talk.teacherTalks,
     selectedTags: state.search.selectedTags,
     teacherTags: state.search.teacherTags,
     socket: state.io.socket,

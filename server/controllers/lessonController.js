@@ -9,27 +9,31 @@ const MessageUser = require('../models/messageUser');
 const TagAction = require('../models/tagAction');
 const Talk = require('../models/talk');
 const TalkPool = require('../models/talkPool');
+const TeacherTalk = require('../models/teacherTalk');
 const { addUserTags } = require('./usersController');
 
 exports.searchTeacher = (io, socket, { topic, selectedTags }) => {
-  const talk = { selectedTags, topic, user: socket.authUser._id };
-  let count = 0;
-  selectedTags.forEach(tag => {
-    TalkPool.updateOne({ tag: tag._id }, { $push: { talks: talk } })
-    .then(talk => {
-      count++;
-      if (count === 3) {
-        socket.emit('searching_teacher');
-      }
-    })
-    .catch(err => console.log(err))
-  });
+  const talk = new TeacherTalk({ selectedTags, topic, user: socket.authUser._id });
+  talk.save().then(() => {
+    let count = 0;
+    selectedTags.forEach(tag => {
+      TalkPool.updateOne({ tag: tag._id }, { $push: { talks: talk } })
+      .then(t => {
+        count++;
+        if (count === 3) {
+          socket.emit('your_teacher_talk', { talk });
+        }
+      })
+        .catch(err => console.log(err))
+    });
+  })
+    .catch(err => console.log(err));
 };
 
 exports.searchTalks = (io, socket, data) => {
   const tags_ids = data.selectedTags.map(tag => tag._id);
-  TalkPool.find({tag: { $in: tags_ids } }).select('talks')
-    .populate({path: 'talks.selectedTags', select: 'name' })
+  TalkPool.find({tag: { $in: tags_ids } }).populate('talks').select('talks')
+    .populate({ path: 'talks.selectedTags', select: 'name' })
     .populate({ path: 'talks.user', select: 'name' })
     .then(talks => {
       socket.join('teachers_room');

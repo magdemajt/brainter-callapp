@@ -15,13 +15,15 @@ const {
 const {
   searchTeacher,
   searchTalks,
-  selectTalk
+  selectTalk,
+  cancelTalk
 } = require('../controllers/lessonController');
 const {
   createNewMessage,
   getMessages,
   getMessageUsers,
-  beginChat
+  beginChat,
+  seenMessages
 } = require('../controllers/messageController');
 
 module.exports = (io) => {
@@ -37,6 +39,7 @@ module.exports = (io) => {
     socket.on('get_surveys', data => userSurveys(io, socket, data));
     socket.on('search_teacher', data => searchTeacher(io, socket, data));
     socket.on('search_talks', data => searchTalks(io, socket, data));
+    socket.on('cancel_teacher_talk', data => cancelTalk(io, socket, data));
     socket.on('select_talk', data => selectTalk(io, socket, data));
     socket.on('finish_survey', data => finishSurvey(io, socket, data));
     socket.on('incoming_call', data => handleIncomingCall(io, socket, data));
@@ -44,6 +47,7 @@ module.exports = (io) => {
     socket.on('peer_connection', data => createPeer(io, socket, data));
     socket.on('receiver_stream', data => receiverStream(io, socket, data));
     socket.on('create_message', data => createNewMessage(io, socket, data));
+    socket.on('seen_messages', data => seenMessages(io, socket, data));
     socket.on('get_message_users', data => getMessageUsers(io, socket, data));
     socket.on('get_messages', data => getMessages(io, socket, data));
     socket.on('begin_chat', data => beginChat(io, socket, data));

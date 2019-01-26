@@ -11,6 +11,7 @@ exports.beginChat = (io, socket, data) => {
 exports.createNewMessage = (io, socket, data) => {
   const message = new Message({
     sender: socket.authUser._id,
+    seen: [],
     text: data.text,
     messages: []
   });
@@ -33,6 +34,16 @@ exports.createNewMessage = (io, socket, data) => {
         }
       });
     });
+  });
+};
+
+exports.seenMessages = (io, socket, data) => {
+  data.messages.forEach(msg => {
+    let count = 0;
+    Message.updateOne({_id: msg._id, seen: { $not: { $contains: socket.authUser._id } } }, { $push: { seen: socket.authUser._id} }).then(() => {
+      count++;
+    })
+    .catch(err => console)
   });
 };
 

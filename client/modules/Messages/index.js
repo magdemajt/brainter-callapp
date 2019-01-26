@@ -48,8 +48,9 @@ class Messages extends Component {
       }
     }
   }
-  onSelect = (messageUser) => {
+  onSelect = (messageUser, newMsgs) => {
     this.props.initMessageUser(messageUser);
+    this.props.socket.emit('seen_messages', { messages: newMsgs });
   }
 
   render() {
