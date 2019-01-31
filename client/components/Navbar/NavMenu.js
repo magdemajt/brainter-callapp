@@ -8,7 +8,7 @@ import CallingModal from '../CallingModal';
 import history from '../../history';
 import { translate } from 'react-polyglot';
 import Tooltip from 'rc-tooltip';
-import '../../sounds/calling.mp3';
+import mp3 from '../../sounds/calling.mp3';
 import { axiosPost } from '../../axiosWrappers';
 // Import Style
 
@@ -59,7 +59,7 @@ class NavMenu extends React.Component {
         this.props.socket.emit('incoming_call', { messageUser: talk.messageUser });
         this.props.initCurrentTalk(talk, false);
         try {
-          let audio = new Audio('../../sounds/calling.mp3');
+          let audio = new Audio(mp3);
           let count = 0;
           let timeout = setInterval(() => {
             if(count === 6) {

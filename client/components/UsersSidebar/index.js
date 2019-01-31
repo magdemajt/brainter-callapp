@@ -1,25 +1,26 @@
 /* eslint-disable */
 import React from 'react';
 import { connect } from 'react-redux';
-import Modal from './Modal';
 import Tooltip from 'rc-tooltip';
 import { translate } from 'react-polyglot';
 
-class CallingModal extends React.Component {
+class UsersSidebar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      topic: '',
-      confirmed: false,
-      selectedTags: [],
-      tags: [],
-      caller: false
+      recUsers: [] //recommended users to talk
     };
+    this.setListeners = false;
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    if (this.props.authUser !== undefined && this.props.authUser.tags !== undefined && this.props.authUser.tags.length > 0 && (prevProps.authUser === undefined || prevProps.authUser.tags === undefined || (prevProps.authUser.tags.length !== this.props.authUser.tags.length))) {
-      this.setState({ tags: this.props.authUser.tags });
+    if (this.props.socket !== undefined && !this.setListeners) {
+      this.props.socket.removeListener('recom_users');
+      this.props.socket.on('recom_users', (data) => {
+        this.setState({ recUsers: data.users });
+      });
+      this.props.socket.emit('get_recom_users');
+      this.setListeners = true;
     }
   }
 
@@ -98,49 +99,7 @@ class CallingModal extends React.Component {
   }
 
   render () {
-    const props = this.props;
-    if (this.props.clearState && (this.state.topic !== '' || this.state.confirmed)) {
-      this.clearState();
-      this.props.editClear(false);
-    }
-    const modalConfirm = (
-      <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.startCall')} >
-        <button id="modalAnswerButton" onClick={() => { props.socket.emit('create_incoming_call', { topic: this.state.topic || 'No topic', messageUser: props.messageUser, tags: this.state.selectedTags, caller: this.getCaller() }); this.editConfirmed(true); }} >
-          <i className="border" /> 
-        </button>
-      </Tooltip>
-    );
-    const modalCancel = (
-      <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
-        <button id="modalRejectButton" onClick={() => { this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.messageUser }) : this.endCalling() }}>
-          <i className="border" />
-        </button>
-      </Tooltip>
-    );
-    const tags = this.generateTags();
-    return (
-      <Modal modalHeader={'Outcoming call'} calling={true} cancelButton={modalCancel} confirmButton={!this.state.confirmed ? modalConfirm: null} opened={props.opened}>
-        {this.state.confirmed ? 
-        ( <React.Fragment>
-            Calling, topic: {this.state.topic || 'No topic'}
-            <ul className="list" style={{maxHeight: '6.5rem'}}>
-              {tags.tagsNoButton}
-            </ul>
-          </React.Fragment>) :
-          <React.Fragment>
-            <input type="checkbox" value={this.state.caller} onChange={(e) => this.setState({ caller: !this.state.caller })} /> I am teacher.
-            Enter tags of the talk
-            <ul className="list" style={{maxHeight: '6.5rem'}}>
-              {tags.selected}
-              <hr />
-              {tags.tags}
-            </ul>
-            <input className="input" type="text" value={this.state.topic} placeholder="Here enter the topic of talk..." onChange={(e) => {this.editTopic(e.target.value)}} />
-            Once you confirm the topic there is no way back!!!
-          </React.Fragment>
-        }
-      </Modal>
-    );
+    return ();
   }
 }
 const mapStateToProps = state => ({
@@ -158,5 +117,5 @@ const mapDispatchToProps = dispatch => {
     })
   };
 }
-export default translate()(connect(mapStateToProps, mapDispatchToProps)(CallingModal));
+export default translate()(connect(mapStateToProps, mapDispatchToProps)(UsersSidebar));
 /* eslint-enable */

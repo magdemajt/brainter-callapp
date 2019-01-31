@@ -8,7 +8,7 @@ const UserSelection = ({
 }) => {
   const newMessages = (messageUser) => {
     const newMsgs = _.filter(messageUser.messages, (o) => { return o.sender === authUser._id && o.seen.find(user => user._id === authUser._id)  });
-    return newMsgs.length;
+    return newMsgs;
   };
   const names = (participants) => {
     let text = '';
@@ -21,12 +21,12 @@ const UserSelection = ({
     return text;
   };
   const users = messageUsers.map(messageUser => {
-    const newMsgs = 0;
+    const newMsgs = [];
     //const newMsgs = newMessages(messageUser);
     return (<li key={messageUser._id} onClick={() => onSelect(messageUser, newMsgs)} className={userM.hasOwnProperty('_id') && userM._id === messageUser._id ? 'active' : ''}>
       {/* <img src={messageUser.photo.data} alt="User profile image" /> */}
       {names(messageUser.participants)}
-      {newMsgs > 0 ? <span>{newMsgs}</span> : null}
+      {newMsgs.length > 0 ? <span>{newMsgs.length}</span> : null}
     </li>)
   });
   return (

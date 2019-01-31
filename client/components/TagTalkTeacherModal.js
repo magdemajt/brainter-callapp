@@ -12,6 +12,7 @@ class TagTalkTeacherModal extends React.Component {
       confirmed: false,
       selectedTags: [],
       tags: [],
+      dateNow: Date.now
     };
   }
 
@@ -20,27 +21,41 @@ class TagTalkTeacherModal extends React.Component {
       this.setState({ tags: this.props.authUser.tags.filter(tag => tag.level > 5) });
     }
   }
+  componentDidMount () {
+    this.interval = setInterval(() => {
+      this.setState({ dateNow: Date.now });
+    }, 1000)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.interval);
+  }
 
   generateTalks = () => {
     return this.props.talks.map(talk => {
+      if (30 < (this.props.dateDifference + this.state.dateNow - talk.createdAt) / 1000) {
+        this.props.removeTeacherTalk(talk);
+      }
       const tags = (
-        <Tooltip overlay={(<ul className="list">{this.generateTags(talk.selectedTags)}</ul>)}>
+        <Tooltip overlay={(<ul className="list">{this.generateTags(talk.selectedTags, talk._id)}</ul>)}>
           <span>{talk.selectedTags.length}</span>
         </Tooltip>
       );
       return (
-        <li className="list-el">
+        <li className="list-el" key={talk._id}>
         {talk.topic}
         {talk.user.name}
         {tags}
+        {30 - (this.props.dateDifference + this.state.dateNow - talk.createdAt) / 1000} 
+        {/* Nie wiem czy działa */}
         <button className="btn xsm" type="button" onClick={() => this.selectTalk(talk)}>Teach</button>
         </li>
       );
     });
   }
-  generateTags = (tags) => {
+  generateTags = (tags, talk_id) => {
     return tags.map(tag => (
-      <li key={tag._id} className="list-el">
+      <li key={tag._id} className="list-el" key={tag._id + talk_id}>
         {tag.name}
       </li>
     ));
@@ -58,21 +73,21 @@ class TagTalkTeacherModal extends React.Component {
     }
     const modalConfirm = (
       <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.startCall')} >
-        <button id="modalAnswerButton" onClick={() => { props.socket.emit('create_incoming_call', { topic: this.state.topic || 'No topic', messageUser: props.messageUser, tags: this.state.selectedTags, caller: this.props.authUser._id }); this.editConfirmed(true); }} >
+        <button id="modalAnswerButton" onClick={() => {  }} >
           <i className="border" /> 
         </button>
       </Tooltip>
     );
     const modalCancel = (
       <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
-        <button id="modalRejectButton" onClick={() => { this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.messageUser }) : this.endCalling() }}>
+        <button id="modalRejectButton" onClick={() => { props.initTeacherTalks([]); }}>
           <i className="border" />
         </button>
       </Tooltip>
     );
     const talks = this.generateTalks();
     return (
-      <Modal modalHeader={'Outcoming call'} calling={true} cancelButton={modalCancel} confirmButton={!this.state.confirmed ? modalConfirm: null} opened={this.props.opened}>
+      <Modal modalHeader={'Available talks'} calling={true} cancelButton={modalCancel} confirmButton={!this.state.confirmed ? modalConfirm: null} opened={this.props.opened}>
             Enter tags of the talk
             <ul className="list" style={{maxHeight: '6.5rem'}}>
               {talks}
@@ -92,6 +107,14 @@ const mapDispatchToProps = dispatch => {
     startCalling: (messageUser) => dispatch({
       type: 'START_CALLING',
       messageUser
+    }),
+    initTeacherTalks: (teacherTalks) => dispatch({
+      type: 'INIT_TEACHER_TALKS',
+      teacherTalks
+    }),
+    removeTeacherTalk: (teacherTalk) => dispatch({
+      type: 'REMOVE_TEACHER_TALK',
+      teacherTalk
     })
   };
 }

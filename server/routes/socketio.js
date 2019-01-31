@@ -26,12 +26,17 @@ const {
   seenMessages
 } = require('../controllers/messageController');
 
+const {
+  getRecommendedUsers
+} = require('../controllers/usersController');
+
 module.exports = (io) => {
   io.use(validateUserTokenSockets);
 
   io.on('connection', (socket) => {
     socket.join(`room_${socket.authUser._id}`);
     socket.on('get_token', data => getToken(io, socket, data));
+    socket.on('get_recom_users', data => getRecommendedUsers(io, socket, data));
     socket.on('create_incoming_call', data => createNewCall(io, socket, data));
     socket.on('abort_call_client', data => abortCall(io, socket, data));
     socket.on('finish_call_client', data => finishCall(io, socket, data));

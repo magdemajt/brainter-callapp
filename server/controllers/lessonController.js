@@ -20,7 +20,7 @@ exports.searchTeacher = (io, socket, { topic, selectedTags }) => {
       TalkPool.updateOne({ tag: tag._id }, { $push: { talks: talk } })
       .then(t => {
         count++;
-        if (count === 3) {
+        if (count === selectedTags.length || count === 3) {
           socket.emit('your_teacher_talk', { talk });
         }
       })
@@ -32,24 +32,24 @@ exports.searchTeacher = (io, socket, { topic, selectedTags }) => {
 
 exports.searchTalks = (io, socket, data) => {
   const tags_ids = data.selectedTags.map(tag => tag._id);
-  TalkPool.find({tag: { $in: tags_ids } }).populate('talks').select('talks')
+  TalkPool.find({ tag: { $in: tags_ids } }).populate({ path: 'talks', match: { createdAt: { $gte: Date.now - 20 * 1000 } } }).select('talks')
     .populate({ path: 'talks.selectedTags', select: 'name' })
     .populate({ path: 'talks.user', select: 'name' })
     .then(talks => {
       socket.join('teachers_room');
-      socket.emit('teacher_talks', { teacherTalks: talks });
+      socket.emit('teacher_talks', { teacherTalks: talks, date: Date.now });
     })
     .catch(err => console.log(err));
 };
 
 exports.selectTalk = (io, socket, data) => {
-  TalkPool.updateMany({ $in: { talks: data.talk } }, { $pull: { talks: { _id: data.talk._id } } })
-  .then(() => {
+  TalkPool.updateMany({ talks: data.talk }, { $pull: { talks: data.talk._id } })
+  .then((t2) => {
     socket.broadcast.to('teachers_room').emit('selected_talk', { teacherTalk: data.talk });
-    MessageUser.createOrReturn([data.talk.user._id], socket.authUser._id, (messageUsers) => {
+    MessageUser.createOrReturn([data.talk.user, socket.authUser._id], socket.authUser._id, (messageUsers) => {
       const t = new Talk({
         topic: data.talk.topic,
-        MessageUser: messageUsers[0],
+        messageUser: messageUsers[0],
         tags: data.talk.selectedTags,
         caller: socket.authUser._id
       });
@@ -58,14 +58,14 @@ exports.selectTalk = (io, socket, data) => {
         io.to('room_' + data.talk.user._id).emit('teacher_call', { talk: t });
       });      
     });
-  }).catch(err => {});
+  }).catch(err => console.log(err));
 };
 
 exports.cancelTalk = (io, socket, data) => {
   socket.join('teachers_room');
   socket.broadcast.to('teachers_room').emit('selected_talk', { teacherTalk: data.talk });
   socket.leave('teachers_room');
-  TalkPool.updateMany({ $in: { talks: data.talk } }, { $pull: { talks: { _id: data.talk._id } } })
+  TalkPool.updateMany({ talks: data.talk }, { $pull: { talks: data.talk._id } })
   .then(() => {
     
   }).catch(err => {});

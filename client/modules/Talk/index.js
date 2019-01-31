@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import history from '../../history';
+import Blackboard from './components/Blackboard';
 import VideoPlayer from './components/VideoPlayer';
 // Import Style
 
@@ -37,16 +38,20 @@ class Talk extends Component {
         video: true,
         audio: true
       };
-      if (this.props.creator) {
-        this.props.socket.on('got_receiver_stream', () => {
-          if (this.state.leftToConnect === 1) {
-            this.getMediaCreator(constraints, false);
-          } else {
-            this.setState({ leftToConnect: this.state.leftToConnect - 1 });
-          }
-        });
-      } else {
-        this.getMedia(constraints, false);
+      try {
+        if (this.props.creator) {
+          this.props.socket.on('got_receiver_stream', () => {
+            if (this.state.leftToConnect === 1) {
+              this.getMediaCreator(constraints, false);
+            } else {
+              this.setState({ leftToConnect: this.state.leftToConnect - 1 });
+            }
+          });
+        } else {
+          this.getMedia(constraints, false);
+        }
+      } catch (e) {
+        this.clearCall();
       }
     }
   }
@@ -200,8 +205,12 @@ class Talk extends Component {
     history.push(destination);
   }
   endCall = () => {
-    this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));
-    this.props.p2p.destroy();
+    try {
+      this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));
+      this.props.p2p.destroy();
+    } catch (e) {
+
+    }
     this.props.socket.emit('finish_call_client', { talk: this.props.talk });
     this.props.socket.emit('change_blackboard', { talk: this.props.talk, blackboardText: this.state.blackboardText });
     this.clearCall();
@@ -216,8 +225,7 @@ class Talk extends Component {
   render() {
     return (
       <div className="container center offset-15">
-        {/* <Blackboard text={this.state.blackboardText} changeText={this.changeText} caller={this.props.authUser._id === this.props.talk.caller} /> */}
-        
+        <Blackboard text={this.state.blackboardText} changeText={this.changeText} caller={this.props.authUser._id === this.props.talk.caller} /> 
         <VideoPlayer localStream={this.state.localStream} remoteStream={this.state.remoteStream} onEndCall={this.endCall} muteLocal={this.muteLocalOutcoming} unmuteLocal={this.unmuteLocalOutcoming} muteVideo={this.muteVideo} unmuteVideo={this.unmuteVideo}/> 
       </div>
     );

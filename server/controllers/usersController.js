@@ -15,6 +15,11 @@ exports.addUserTags = (user, tags, callback) => {
     });
 };
 
+exports.getRecommendedUsers = (io, socket, data) => {
+  //here find recommended user to talk to algorithm
+  socket.emit('recom_users', { users });
+};
+
 exports.getUser = (req, res) => {
   User.getById(req.params.id, (user) => {
     user ? res.send(user) : res.sendStatus(404);

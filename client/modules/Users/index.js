@@ -23,26 +23,34 @@ class Users extends Component {
       topic: '',
       tagsFilter: '',
       teacherFilter: '',
-      teacherModal: false
+      teacherModal: false,
+      dateDifference: 0
     };
+    this.setListeners = false;
   }
 
-  // clear state in cancelling (teacher talk)
+  // add show new Talk request when added to Pool!!!
 
   componentDidUpdate (prevProps) {
-    if (prevProps.socket === undefined && this.props.socket !== undefined) {
+    if (this.props.socket !== undefined && !this.setListeners) {
+      this.setListeners = true;
       this.props.socket.removeListener('teacher_talks');
       this.props.socket.removeListener('selected_talk');
       this.props.socket.removeListener('starting_teaching');
       this.props.socket.removeListener('teacher_call');
       this.props.socket.removeListener('your_teacher_talk');
       this.props.socket.on('teacher_talks', (data) => {
-        const talks = _.flattenDeep(data.teacherTalks);
+        const talks = _.flatMap(data.teacherTalks, (o) => o.talks);
+        this.setState({ dateDifference: data.date - Date.now});
         this.props.initTeacherTalks(talks);
         this.setState({ teacherModal: true });
       });
       this.props.socket.on('your_teacher_talk', (data) => {
         this.props.initTeacherTalks([data.talk]);
+        setTimeout(() => {
+          this.props.socket.emit('cancel_teacher_talk', { talk: data.talk });
+          this.props.initTeacherTalks([]);
+        }, 30000);
       });
       this.props.socket.on('selected_talk', (data) => {
         this.props.removeTeacherTalk(data.teacherTalk);
@@ -125,6 +133,7 @@ class Users extends Component {
 
   searchForTeacherTalks = () => {
     this.props.socket.emit('search_talks', { selectedTags: this.props.teacherTags })
+    setTimeout(() => {}, )
   }
 
   closeTeacherModal = () => {
@@ -141,7 +150,8 @@ class Users extends Component {
         this.props.authUser._id,
         id
       ],
-      talk: true
+      talk: true,
+      caller: this.state.caller
     });
   }
 
@@ -168,8 +178,8 @@ class Users extends Component {
             {this.state.opened === '3' ? <TeachByTags initFilter={this.changeTeacherFilter} tagsFilter={this.state.teacherFilter} search={this.searchForTeacherTalks} /> : null}
           </div>
         : null}
-        <TagTalkModal opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user._id === this.props.authUser._id} />
-        <TagTalkTeacherModal opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user._id !== this.props.authUser._id} />
+        <TagTalkModal opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user === this.props.authUser._id} />
+        <TagTalkTeacherModal dateDifference={this.state.dateDifference} opened={this.props.teacherTalks !== undefined && this.props.teacherTalks.length > 0 && this.props.teacherTalks[0].user !== this.props.authUser._id} />
       </div>
     );
   }

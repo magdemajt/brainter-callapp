@@ -14,14 +14,16 @@ const SearchUserByName = ({
   const mappedUsers = filter != '' ? users
     .filter(user => user.name.includes(filter))
     .map((user) => (
-      <li key={user._id}>
+      <li key={user._id} className="flex-el">
           <img src={`/api/user/photo/${user._id}`} alt="Profile image" />
           {user.name}
+          <div>
             <button className="view-profile-button" onClick={() => viewUserProfile(user._id)} />
           {authUser._id !== user._id ? (
           <React.Fragment>
             <button className="call-button" onClick={() => talkToUser(user._id)} />
           </React.Fragment>) : null }
+          </div>
         </li>
     )) : []; /* eslint-enable */
   return (
