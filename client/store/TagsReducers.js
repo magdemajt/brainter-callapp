@@ -10,6 +10,9 @@ const tagsReducer = (oldState = initialState, action) => {
     case 'INIT_TAGS': {
       return Object.assign({}, state, { tags: action.tags });
     }
+    case 'RESET': {
+      return initialState;
+    }
     default:
       return state;
   }

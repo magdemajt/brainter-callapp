@@ -8,7 +8,7 @@ import { translate } from 'react-polyglot';
 const TagTalkModal = (props) => {
   const modalCancel = (
     <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.reject')} >
-      <button id="modalRejectButton" onClick={() => { props.socket.emit('cancel_teacher_talk', { talk: props.talks[0] }); props.initTeacherTalks([]); }}>
+      <button id="modalRejectButton" onClick={() => { props.socket.emit('cancel_teacher_talk', { talk: props.talks[0] }); props.initTeacherTalks([]); props.closeModal(); }}>
         <i className="border" />
       </button>
     </Tooltip>

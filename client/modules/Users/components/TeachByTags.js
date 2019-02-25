@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 // Import Actions
 
 const TeachByTags = ({
-  user, search, selectTag, selectedTags, tagsFilter, initFilter
+  user, search, selectTag, selectedTags, tagsFilter, initFilter, userAmount, changeUserAmount, changeTopic
 }) => {
   const tagElements = [];
   const searchTags = [];
@@ -17,17 +17,15 @@ const TeachByTags = ({
       if (selectedTags.filter(el => tag._id === el._id).length === 0) {
         if (tag.name.includes(tagsFilter)) {
           tagElements.push(
-          <li key={tag._id} className="list-el">
+            <li key={tag._id} className="list-el" onClick={() => selectTag(tag)}>
               {tag.name}
-              <button className="btn xsm" type="button" onClick={() => selectTag(tag)}>Select</button>
             </li>
           );
         }
       } else {
         searchTags.push(
-          <li key={tag._id} className="list-el">
+          <li key={tag._id} className="list-el selected-el" onClick={() => selectTag(tag)}>
             {tag.name}
-            <button className="btn xsm" type="button" onClick={() => selectTag(tag)}>Unselect</button>
           </li>
         );
       }
@@ -35,12 +33,23 @@ const TeachByTags = ({
   });
   return (
     <React.Fragment>
-      <input type="text" className="input medium mt-2" placeholder="Enter name..." onChange={e => initFilter(e.target.value)} />
+      <input type="text" className="input mt-2" placeholder="Enter name..." onChange={e => initFilter(e.target.value)} />
+      {userAmount ? <input type="text" className="input" placeholder="Enter topic..." onChange={e => changeTopic(e.target.value)} /> : null}
+
+
+      Multiperson lesson
+<input type="radio" checked={userAmount === true} onChange={() => changeUserAmount(true)} />
+
+
+
+      One user lesson
+<input type="radio" checked={userAmount === false} onChange={() => changeUserAmount(false)} />
       <ul className="list" style={{ minWidth: '35rem' }}>
         {searchTags}
         {tagElements}
       </ul>
-      <button className="btn mti-2" type="button" onClick={search}>Search</button>
+      <button className="btn mti-2" type="button" onClick={() => search(false)}>Teach</button>
+      <button className="btn default" type="button" onClick={() => search(true)}>Paid teaching</button>
     </React.Fragment>
   );
 };

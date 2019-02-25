@@ -10,6 +10,9 @@ const adminReducers = (oldState = initialState, action) => {
     case 'INIT_PERMISSION': {
       return Object.assign({}, state, { permission: action.permission });
     }
+    case 'RESET': {
+      return initialState;
+    }
     default:
       return state;
   }

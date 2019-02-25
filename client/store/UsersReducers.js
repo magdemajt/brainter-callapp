@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 // Initial State
 const initialState = {
@@ -34,6 +35,19 @@ const usersReducer = (oldState = initialState, action) => {
         return Object.assign({}, state, { teacherTags: state.teacherTags.filter(el => el._id !== action.tag._id) });
       }
       return Object.assign({}, state, { teacherTags: state.teacherTags.concat(action.tag) });
+    }
+    case 'USER_NOT_ACTIVE': {
+      const index = _.findIndex(state.users, { _id: action.user });
+      state.users.splice(index, 1, { ...state.users[index], active: false });
+      return state;
+    }
+    case 'USER_ACTIVE': {
+      const index = _.findIndex(state.users, { _id: action.user });
+      state.users.splice(index, 1, { ...state.users[index], active: true });
+      return state;
+    }
+    case 'RESET': {
+      return initialState;
     }
     default:
       return state;

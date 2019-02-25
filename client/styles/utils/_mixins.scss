@@ -1,3 +1,27 @@
 @mixin float($direction) {
     float: unquote($direction);
 }
+@mixin placeholder {
+    ::-webkit-input-placeholder {@content};
+    :-moz-placeholder           {@content};
+    ::-moz-placeholder          {@content};
+    :-ms-input-placeholder      {@content}; 
+}
+
+@mixin tablet {
+    @media (min-width: #{$tablet-width}) and (max-width: #{$desktop-width - 1px}) {
+        @content;
+    }
+}
+
+@mixin phone {
+    @media (max-width: #{$tablet-width}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$desktop-width}) {
+        @content;
+    }
+}

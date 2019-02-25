@@ -3,7 +3,8 @@ const User = require('../models/user');
 const MessageUser = require('../models/messageUser');
 
 exports.beginChat = (io, socket, data) => {
-  MessageUser.createOrReturn(data.participants, socket.authUser._id, (messageUsers) => {
+  const participants = data.participants.find(part => part === socket.authUser._id) !== undefined ? data.participants : data.participants.concat(socket.authUser._id);
+  MessageUser.createOrReturn(participants, socket.authUser._id, (messageUsers) => {
     // Poprawić na messageUser, gdzie jest dwóch użytkowników
     socket.emit('message_user_new', { messageUser: messageUsers[0], talk: data.talk });
   });
@@ -20,7 +21,8 @@ exports.createNewMessage = (io, socket, data) => {
       messageUser: data.messageUser,
       sender: socket.authUser._id,
       text: data.text,
-      _id: message._id
+      _id: message._id,
+      seen: []
     });
     MessageUser.addMessage(data.messageUser, message._id, (mu) => {
       mu.participants.forEach((part) => {
@@ -29,7 +31,8 @@ exports.createNewMessage = (io, socket, data) => {
             messageUser: data.messageUser,
             sender: socket.authUser._id,
             text: data.text,
-            _id: message._id
+            _id: message._id,
+            seen: []
           });
         }
       });
@@ -38,12 +41,13 @@ exports.createNewMessage = (io, socket, data) => {
 };
 
 exports.seenMessages = (io, socket, data) => {
-  data.messages.forEach(msg => {
+  const messagesFromData = data.messages || [];
+  messagesFromData.forEach((msg) => {
     let count = 0;
-    Message.updateOne({_id: msg._id, seen: { $not: { $contains: socket.authUser._id } } }, { $push: { seen: socket.authUser._id} }).then(() => {
+    Message.updateOne({ _id: msg._id, seen: { $ne: socket.authUser._id } }, { $push: { seen: socket.authUser._id } }).then((t) => {
       count++;
     })
-    .catch(err => console)
+      .catch(err => console.log(err));
   });
 };
 

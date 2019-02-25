@@ -1,26 +1,36 @@
 .message-container {
   list-style-type: none;
-  height: 95%;
+  position: relative;
+  top: 4rem;
+  height: 70vh;
   width: 65vw;
   float: right;
   overflow-y: scroll;
   overflow-x: hidden;
+  background: darken(white, 4%);
+  border-radius: 1rem;
+  padding: .5rem;
+  display: flex;
+  flex-direction: column;
   li {
-    width: 100%;
-    margin-bottom: .8rem;
+    max-width: 100%;
+    padding: .5rem 1.5rem;
   }
   .message {
-    margin: .2rem .2rem;
+    margin: .4rem .2rem;
     border-radius: .5rem;
     white-space: pre-wrap;
     text-align: center;
     font-size: 1.6rem;
+    font-family: 'CooperHewittLight';
     &.left {
       float: left;
       background: $color-secondary;
       color: white;
+      align-self: flex-start;
     }
     &.right {
+      align-self: flex-end;
       float: right;
       background: $color-blue;
       color: white;

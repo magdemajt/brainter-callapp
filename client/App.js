@@ -36,7 +36,7 @@ export default class App extends Component {
           <PrivateRoute path="/messages/:id/:talking" component={Messages} />
           <PrivateRoute exact path="/users" component={Users} />
           <PrivateRoute path="/talk" component={Talk} />
-          <PrivateRoute path="/settings" component={Settings}/>
+          <PrivateRoute path="/settings" component={Settings} />
           <NoRegisterRoute path="/login" component={Login} />
           <NoRegisterRoute path="/register" component={Register} />
           <PrivateRoute path="/admin" component={Admin} />

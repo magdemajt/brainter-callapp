@@ -1,7 +1,13 @@
 #send-btn {
     width: 4rem;
     margin: .5rem 0;
-    top: -10px;
+    top: .5rem;
+    @include tablet {
+        top: -.3rem;
+    }
+    @include phone {
+        top: -.4rem;
+    }
     position: relative;
     height: 4rem;
     border-radius: 50%;
@@ -13,16 +19,22 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 32px;
-        height: 32px;
+        @include tablet {
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        @include phone {
+            transform: translate(-50%, -50%) scale(0.65);
+        }
+        width: 3.2rem;
+        height: 3.2rem;
         content: url('./icons/send-arrow-big.png');
     }
     &:focus {
         outline: 0;
     }
     &:hover::before {
-        width: 32px;
-        height: 32px;
+        width: 3.2rem;
+        height: 3.2rem;
         content: url('./icons/send-arrow-big-color.png');
     }
     &:hover {

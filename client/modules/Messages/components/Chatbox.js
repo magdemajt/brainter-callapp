@@ -11,15 +11,35 @@ class Chatbox extends Component {
       messageText: '',
       previousLength: 0,
       manualScroll: false,
-      loadingData: false
+      loadingData: false,
+      uploadFiles: false,
     };
+    this.messageRef = React.createRef();
+  }
+
+  changeUploadFiles = () => {
+    this.setState({ uploadFiles: !this.state.uploadFiles });
+  }
+
+  endDrag = () => {
+
+  }
+
+  componentDidMount () {
+    window.addEventListener('dragstart', this.startDrag);
+    window.addEventListener('dragend', this.endDrag);
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('dragstart', this.startDrag);
+    window.removeEventListener('dragend', this.endDrag);
   }
 
   handleScroll = () => {
     if (this.props.messages.length < 25) {
       return null;
     }
-    if (!this.state.loadingData && this.refs.messages.scrollTop < 10) {
+    if (!this.state.loadingData && this.messageRef.scrollTop < 20) {
       this.setState({loadingData: true});
       this.props.socket.emit('get_messages', {messageUser: this.props.user._id, part: this.props.messages.length});
     }
@@ -30,17 +50,21 @@ class Chatbox extends Component {
   componentDidUpdate (prevProps) {
     if (prevProps.user._id !== this.props.user._id) {
       this.setState({ loadingData: false, manualScroll: false, previousLength: 0, messageText: '' });
+      let element = this.messageRef.current;
+      element.scrollTop = element.scrollHeight - element.clientHeight;
     }
     if (this.props.messages.length !== this.state.previousLength) {
       if (!this.state.manualScroll) {
-        let element = document.getElementById('bottom')
-        if(element !== null) {
-          element.scrollIntoView();
-        }
+        let element = this.messageRef.current;
+        element.scrollTop = element.scrollHeight - element.clientHeight;
       }
       this.setState({previousLength: this.props.messages.length, loadingData: false});
     }
   }
+
+  filesUpload = (files) => {
+    console.log(files)
+  };
 
   formatMessage = () => {
     let seenNewLine = 0;
@@ -78,13 +102,13 @@ class Chatbox extends Component {
       const messages = this.props.messages.map((message, index, arr) => (<ChatMessage message={message} key={message._id} float={message.sender === this.props.authUser._id} bottom={index === arr.length - 1 ? true : false} />));
       return (
         <React.Fragment>
-          <ul ref="messages" className="message-container" onScroll={this.handleScroll}>
+          <ul ref={this.messageRef} className="message-container" onScroll={this.handleScroll}>
             {this.state.loadingData ? 
             <li>...</li>
              : null}
             {messages}
           </ul>
-          <ChatInput disabled={this.props.disabledInput} messageText={this.state.messageText} send={this.send} onEdit={this.onEdit} />
+          <ChatInput disabled={this.props.disabledInput} messageText={this.state.messageText} send={this.send} onEdit={this.onEdit} onDrop={this.filesUpload} dragAndDrop={this.state.uploadFiles} changeUploadFiles={this.changeUploadFiles}/>
         </React.Fragment>
       );
     } else {

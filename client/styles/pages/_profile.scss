@@ -8,14 +8,45 @@
     min-width: 30rem;
     max-width: 44rem;
     max-height: 20rem;
+    @include phone {
+      min-height: 10rem;
+      min-width: 5rem;
+      max-width: 10rem;
+      max-height: 20rem;
+    }
   }
 }
 .tag-input {
   width: 3.5rem;
+  border: 0;
+  border-radius: .5rem;
   float: right;
+}
+.user-active {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  @include phone {
+    width: 3rem;
+    height: 3rem;
+  }
+  &.small {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  bottom: 5%;
+  right: 5%;
+  border-radius: 50%;
+  background: lighten($color-success, 10%);
+  &.not {
+    background: $color-red;
+  }
 }
 #profile-image {
   width: 18rem;
+  @include phone {
+    width: 9rem;
+  }
   border-radius: 50%;
   border: solid 1px $border-default;
 }

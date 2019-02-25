@@ -17,6 +17,7 @@ const ProfileIcon = ({ editing, user, onDrop }) => {
     content = (
       <React.Fragment>
         <img id="profile-image" src={`/api/user/photo/${user._id}`} alt="Profile" />
+        <span className={user.active ? 'user-active' : 'user-active not'} />
       </React.Fragment>
     );
   }

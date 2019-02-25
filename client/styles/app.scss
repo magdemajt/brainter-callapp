@@ -40,3 +40,10 @@ body {
   font-size: 1.6rem;
   bottom: .5rem;
 }
+input, textarea {
+  @include placeholder {
+    font-family: 'CooperHewittBook';
+    font-size: 1.6rem;
+    color: green;
+  }
+}

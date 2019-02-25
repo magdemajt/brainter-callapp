@@ -8,22 +8,39 @@
     border-radius: 50%;
     background: transparent;
     transition: all .5s;
-    border: solid transparent 1px;
+    border: 0;
     &::before {
         position: absolute;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%);
-        width: 24px;
-        height: 24px;
-        content: url('./icons/call-icon.png');
+        transform: translate(-50%, -50%) scale(0.33);
+        @include tablet {
+            transform: translate(-50%, -50%) scale(0.22);
+        }
+        @include phone {
+            transform: translate(-50%, -50%) scale(0.15);
+        }
+        width: 96px;
+        height: 96px;
+        content: url('./icons/phone-icon-big.png');
     }
     &:hover::before {
-        width: 24px;
-        height: 24px;
-        content: url('./icons/call-icon-color.png');
+        width: 96px;
+        height: 96px;
+        content: url('./icons/phone-icon-color-big.png');
     }
     &:hover {
         cursor: pointer;
+    }
+    &.big {
+        &::before {
+            transform: translate(-50%, -50%) scale(0.5);
+            @include tablet {
+                transform: translate(-50%, -50%) scale(0.33);
+            }
+            @include phone {
+                transform: translate(-50%, -50%) scale(0.22);
+            }
+        }
     }
 }

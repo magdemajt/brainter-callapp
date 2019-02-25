@@ -1,4 +1,4 @@
-
+import _ from 'lodash';
 // Initial State
 const initialState = {
   messageUsers: [],
@@ -11,10 +11,11 @@ const messageReducers = (oldState = initialState, action) => {
   const state = Object.assign({}, oldState);
   switch (action.type) {
     case 'INIT_MESSAGE_USERS': {
-      const messageUsers = action.messageUsers.map((mu) => {
+      const messageUsers = [...state.messageUsers];
+      action.messageUsers.forEach((mu) => {
         const newMu = Object.assign({}, mu);
         newMu.messages.reverse();
-        return newMu;
+        messageUsers.push(newMu);
       });
       return Object.assign({}, state, { messageUsers });
     }
@@ -55,6 +56,15 @@ const messageReducers = (oldState = initialState, action) => {
       newMu.messages.reverse();
       const messageUsers = state.messageUsers.concat(newMu);
       return Object.assign({}, state, { messageUsers });
+    }
+    case 'SEEN_MESSAGES': {
+      const index = _.findIndex(state.messageUsers, action.messageUser);
+      const newMsgs = _.map(state.messageUsers[index].messages, message => ((message.sender !== action.user._id && !message.seen.find(u => u === action.user._id)) ? { ...message, seen: message.seen.concat(action.user._id) } : message));
+      state.messageUsers[index] = { ...state.messageUsers[index], messages: newMsgs };
+      return state;
+    }
+    case 'RESET': {
+      return initialState;
     }
     default:
       return state;

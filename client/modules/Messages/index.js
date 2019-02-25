@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import UserSelection from './components/UserSelection';
 import Chatbox from './components/Chatbox';
+import _ from 'lodash';
+import NewMessageUserModal from './components/NewMessageUserModal';
 
 // Import Style
 
@@ -17,8 +20,12 @@ class Messages extends Component {
       messages: [], // Current user's messages
       user: this.props.user,
       filteredTags: this.props.tags,
-      filter: ''
+      filter: '',
+      createMUserModal: false,
+      part: Math.ceil(this.props.messageUsers.length / 15)
     };
+    this.listRef = React.createRef();
+    this.updatingMessageUsers = false;
   }
   openMessagesIfRouteUser () {
     return this.props.messageUsers.find(mu => {
@@ -48,16 +55,55 @@ class Messages extends Component {
       }
     }
   }
-  onSelect = (messageUser, newMsgs) => {
-    this.props.initMessageUser(messageUser);
+  componentDidUpdate (prevProps) {
+    if (prevProps.user.hasOwnProperty('messages') && this.props.user.hasOwnProperty('messages') && this.props.user.messages.length > prevProps.user.messages.length) {
+      const newUnsorted = (_.chunk(this.props.user.messages, prevProps.user.messages.length)[1]);
+      const newMsgs =_.filter(newUnsorted, o => o.sender !== this.props.authUser._id && !o.seen.find(user => user === this.props.authUser._id));
+      this.seenMessages(this.props.user, newMsgs);
+    }
+    if (prevProps.messageUsers.length < this.props.messageUsers.length) {
+      this.updatingMessageUsers = false;
+    }
+  }
+  seenMessages = (messageUser, newMsgs) => {
+    this.props.seenMessages(messageUser, this.props.authUser);
     this.props.socket.emit('seen_messages', { messages: newMsgs });
+  }
+  onSelect = (messageUser, newMsgs = []) => {
+    this.props.initMessageUser(messageUser);
+    this.seenMessages(messageUser, newMsgs);
+  }
+
+  getMoreMessageUsers = () => {
+    const containerNode = this.listRef.current;
+    if (containerNode.scrollHeight - containerNode.clientHeight - containerNode.scrollTop < 60) {
+      if (!this.updatingMessageUsers) {
+        this.props.socket.emit('get_message_users', { part: this.state.part });
+        this.setState({ part: this.state.part + 1 });
+        this.updatingMessageUsers = true;
+      }
+    }
+  }
+
+  closeModal = () => {
+    this.setState({createMUserModal: false});
+  }
+
+  generateMessagePanel = () => {
+    return (
+      <li key="magicpanel">
+        <button className="create-btn" onClick={() => this.setState({createMUserModal: true})}/>
+      </li>
+    );
   }
 
   render() {
+    const messagePanel = this.generateMessagePanel();
     return (
-      <div className="container fluid center offset-15 height-60">
-        <UserSelection onSelect={this.onSelect}/>
+      <div className="container fluid center offset-8 height-60">
+        <UserSelection onSelect={this.onSelect} messagePanel={messagePanel} getMoreMessageUsers={this.getMoreMessageUsers} listRef={this.listRef}/>
         <Chatbox disabledInput={this.props.user.participants.filter(part => part !== null).length < 2} messages={this.props.user !== undefined && this.props.user.hasOwnProperty('messages') ? this.props.user.messages : []} />
+        <NewMessageUserModal opened={this.state.createMUserModal} closeModal={this.closeModal} />
       </div>
     );
   }
@@ -111,6 +157,11 @@ const mapDispatchToProps = (dispatch) => {
     }),
     clearCurrentTalk: () => dispatch({
       type: 'CLEAR_TALK'
+    }),
+    seenMessages: (messageUser, user) => dispatch({
+      type: 'SEEN_MESSAGES',
+      messageUser,
+      user
     })
   };
 };

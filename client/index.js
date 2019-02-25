@@ -47,7 +47,8 @@ const phrases = {
     messageInput: 'Enter text of your message...'
   },
   user: {
-    sendmsg: 'Send message'
+    sendmsg: 'Send message',
+    call: 'Call'
   }
 };
 ReactDOM.render((

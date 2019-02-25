@@ -24,7 +24,8 @@ class CallingModal extends React.Component {
   }
 
   addTag = (index) => {
-    if (this.state.tags.length < 3) {
+    console.log('Hello')
+    if (this.state.selectedTags.length < 3) {
       const newTags = this.state.selectedTags.concat(this.state.tags[index]);
       this.setState({ selectedTags: newTags });
     }
@@ -34,18 +35,16 @@ class CallingModal extends React.Component {
     const tagsToGenerate = {
       selected: this.state.selectedTags.map((tag, index) => {
         return (
-          <li className="list-el" key={tag.name + '1'}>
+          <li className="list-el selected-el" key={tag.name + '1'} onClick={() => this.removeTag(index)}>
             {tag.name}
-            <button className="btn xsm" type="button" onClick={() => this.removeTag(index)}>Remove</button>
           </li>
         );
       }),
       tags: this.state.tags.map((tag, index) => {
         if (!this.state.selectedTags.find(t => { return t._id === tag._id })) {
           return (
-            <li className="list-el" key={tag.name + '2'}>
+            <li className="list-el" key={tag.name + '2'} onClick={() => this.addTag(index)}>
               {tag.name}
-              <button className="btn xsm" type="button" onClick={() => this.addTag(index)}>Add</button>
             </li>
           );
         } else {

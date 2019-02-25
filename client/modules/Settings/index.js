@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { addAuthTags, deleteAuthTags, updateWithTags, updateAuthWithTags, getTags, updatePhoto, getUsers, getUsersByTags, getUser, updateEmail, updatePassword } from '../../axiosWrappers/users';
 import history from '../../history';
+import cookie from 'cookies-js';
 import settingEnum from './settingEnum';
 import Toolbar from './components/Toolbar';
 import SetEmail from './components/SetEmail';
@@ -44,6 +45,13 @@ class Settings extends Component {
   changeActive = (newActive) => {
     this.setState({ active: newActive });
   }
+
+  logOut = () => {
+    this.props.socket.emit('user_not_active');
+    this.props.resetState();
+    cookie.expire('token');
+    cookie.expire('io');
+  };
 
   changeEmail = (newMail) => {
     checkIfEmailAvailable(newMail.trim(), (res) => {
@@ -101,11 +109,11 @@ class Settings extends Component {
       }
     }
     return (
-      <div className="container fluid offset-15 flex ml-1-5">
+      <div className="container fluid offset-8 flex ml-1-5">
         <div className="card">
           {view}
         </div>
-        <Toolbar changeSettingPage={this.changeActive} permission={this.props.permission}/>
+        <Toolbar changeSettingPage={this.changeActive} permission={this.props.permission} logOut={this.logOut}/>
       </div>
     );
   }
@@ -140,6 +148,9 @@ const mapDispatchToProps = (dispatch) => {
     initPermission: (permission) => dispatch({
       type: 'INIT_PERMISSION',
       permission
+    }),
+    resetState: () => dispatch({
+      type: 'RESET'
     })
   };
 };

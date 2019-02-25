@@ -9,7 +9,9 @@ import history from '../../history';
 import { translate } from 'react-polyglot';
 import Tooltip from 'rc-tooltip';
 import mp3 from '../../sounds/calling.mp3';
+import { Link, withRouter } from 'react-router-dom';
 import { axiosPost } from '../../axiosWrappers';
+import CallWindow from '../CallWindow';
 // Import Style
 
 
@@ -23,10 +25,22 @@ class NavMenu extends React.Component {
     this.state = {
       clear: false,
     };
+    this.hasListeners = false;
+    this.timeout = null;
   }
-
   editClear = (clear) => {
     this.setState({clear});
+  }
+
+  clearTalk = () => {
+    try {
+      this.props.p2p.send(JSON.stringify({ type: 'END_CALL' }));
+      this.props.p2p.destroy();
+    } catch (e) {
+
+    }
+    this.props.socket.emit('finish_call_client', { talk: this.props.talk });
+    this.props.socket.emit('change_blackboard', { talk: this.props.talk, blackboardText: this.props.blackboardText });
   }
 
   setListeners = () => {
@@ -40,18 +54,34 @@ class NavMenu extends React.Component {
     });
     this.props.socket.on('abort_call', () => {
       this.props.clearCurrentTalk();
+      clearInterval(this.timeout);
+      this.timeout = null;
       this.editClear(true);
     });
     this.props.socket.on('answer_call', () => {
       this.props.toggleSeen();
       this.props.startCalling(null);
       this.editClear(true);
+      clearInterval(this.timeout);
+      this.timeout = null;
       history.push('/talk');
     });
     this.props.socket.on('message_user_new', (data) => {
       this.props.addMessageUser(data.messageUser);
       history.push(`/messages/${this.props.searchUser._id}/${data.talk}`);
-    })
+    });
+
+    this.props.socket.on('user_not_active', ({user}) => {
+      this.props.userNotActive(user);
+      if (this.props.talk.hasOwnProperty('_id') && this.props.messageUsers.find(mu => { return mu._id === this.props.talk.messageUser && mu.participants.find(part => part._id === user) !== undefined }) !== undefined) {
+        this.clearTalk();
+      }
+    });
+
+    this.props.socket.on('user_active', ({user}) => {
+      this.props.userActive(user);
+    });
+
     this.props.socket.on('incoming_call', (data) => {
       const talk = data.talk;
       talk.tags = data.tags;
@@ -69,6 +99,7 @@ class NavMenu extends React.Component {
             audio.play();
             count++;
           }, 7000);
+          this.timeout = timeout;
         }
         catch (err) {
           
@@ -85,6 +116,8 @@ class NavMenu extends React.Component {
         this.props.unshiftMessage(message, messageUser._id);
       });
     });
+
+    this.hasListeners = true;
   }
   componentDidMount() {
     const token = cookie.get('token');
@@ -92,17 +125,25 @@ class NavMenu extends React.Component {
     if (token) {
       this.props.initToggleUser(token);
       this.setupListenersAndEverything(redirect);
-    } else {
-      window.addEventListener('setupToken', this.tokenEventListener);
     }
-    
   }
-  tokenEventListener = (e) => {
-    this.setupListenersAndEverything();
-    window.removeEventListener('setupToken', this.tokenEventListener);
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.user.token !== '' && this.props.user.token === '') {
+      this.hasListeners = false;
+    }
+    if (!this.hasListeners) {
+      const token = cookie.get('token');
+      const redirect = cookie.get('redirect');
+      if (token) {
+        this.props.initToggleUser(token);
+        this.setupListenersAndEverything(redirect);
+      }
+    }
   }
 
   setupListenersAndEverything (redirect) {
+      this.hasListeners = true;
       getAuth((res) => {
         this.props.initSocket(res.data.token);
         this.props.initUser(res.data);
@@ -113,10 +154,8 @@ class NavMenu extends React.Component {
         }
       }, (err) => {
         this.props.initToggleUser(null);
+        this.hasListeners = false;
       });
-  }
-  componentWillUnmount () {
-    window.removeEventListener('setupToken', this.tokenEventListener);
   }
 
   render() {
@@ -124,25 +163,40 @@ class NavMenu extends React.Component {
       return (
         <React.Fragment>
           <nav className="nav">
-            <Tooltip placement="bottomLeft" trigger={['hover']} overlay={this.props.t('nav.users')}>
+              <Link to="/" id="brainterLogo">
+                <span id="first">B</span>
+                <span id="second">S</span>
+              </Link>
+              {this.props.talk.hasOwnProperty('_id') && this.props.seen && this.props.location.pathname !== '/talk' && this.props.talkMu === null ? (
+                <NavMenuItem location="/talk" locationName="Return to talk" />
+              ) : null}
               <NavMenuItem location="/users" locationName="Users" />
-            </Tooltip>
-            <Tooltip placement="bottomLeft" trigger={['hover']} overlay={this.props.t('nav.messages')}>
               <NavMenuItem location="/messages/0/false" locationName="Messages" />
-            </Tooltip>
-            <Tooltip placement="bottomLeft" trigger={['hover']} overlay={this.props.t('nav.profile')}>
-              <NavMenuItem location="/profile" locationName="Profile" />
-            </Tooltip>
-            <Tooltip placement="bottomLeft" trigger={['hover']} overlay={this.props.t('nav.settings')}>
-              <NavMenuItem location="/settings" locationName="Settings" />
-            </Tooltip>
+              <div className="nav-item">
+                <Link to="/profile" id="Profile" style={{justifyContent: 'space-between', paddingLeft: '.5rem'}}>
+                  <img id="navProfile" src={`/api/user/photo/${this.props.user._id}`}/>
+                  {this.props.user.name || "Profile"}
+                </Link>
+              </div>
           </nav>
+          {this.props.socket !== null && this.props.talk.hasOwnProperty('_id') && this.props.seen && this.props.talkMu === null ? (
+            <CallWindow />
+          ): null}
           <IncomingCallModal opened={!this.props.seen && this.props.talk.hasOwnProperty('_id')} />
           <CallingModal clearState={this.state.clear} editClear={this.editClear} opened={this.props.talkMu !== null} messageUser={this.props.talkMu} />
         </React.Fragment>
       );
-    }
-    return null;
+    } 
+    return (
+      <React.Fragment>
+        <nav className="nav" style={{ justifyContent: 'center' }}>
+          <Link to="/" id="brainterLogo" style={{ margin: 0 }}>
+            <span id="first">BRAINTER</span>
+            <span id="second">.STUDY</span>
+          </Link>
+        </nav>
+      </React.Fragment>
+    );
   }
 }
 
@@ -156,7 +210,8 @@ const mapStateToProps = state => ({
   talkMu: state.talk.messageUser,
   p2p: state.io.p2p,
   messageUsers: state.messages.messageUsers,
-  messageUser: state.messages.user
+  messageUser: state.messages.user,
+  blackboardText: state.talk.blackboardText
 });
 /* eslint-disable */
 const mapDispatchToProps = (dispatch) => {
@@ -218,9 +273,17 @@ const mapDispatchToProps = (dispatch) => {
     }),
     clearCurrentTalk: () => dispatch({
       type: 'CLEAR_TALK'
+    }),
+    userNotActive: (user) => dispatch({
+      type: 'USER_NOT_ACTIVE',
+      user
+    }),
+    userActive: (user) => dispatch({
+      type: 'USER_ACTIVE',
+      user
     })
   };
 };
 /* eslint-enable */
 
-export default translate()(connect(mapStateToProps, mapDispatchToProps)(NavMenu));
+export default withRouter(translate()(connect(mapStateToProps, mapDispatchToProps)(NavMenu)));

@@ -13,8 +13,8 @@
   position: relative;
   margin: auto;
   top: 20vh;
-  min-width: 300px;
-  min-height: 400px;
+  min-width: 30rem;
+  min-height: 40rem;
   width: 40vw;
   background: darken(white, 5%);
   height: 50vh;
@@ -63,7 +63,7 @@
     #modalAnswerButton {
       width: 4rem;
       float: right;
-      margin: 1rem .5rem;
+      margin: 1rem 1rem;
       top: -1px;
       position: relative;
       height: 4rem;
@@ -78,13 +78,25 @@
         position: absolute;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%) rotate(100deg);
-        width: 32px;
-        height: 32px;
-        content: url('./icons/call-icon-color-big.png');
+        transform: translate(-50%, -50%) rotate(100deg) scale(0.5);
+        @include tablet {
+          transform: translate(-50%, -50%) rotate(100deg) scale(0.35);
+        }
+        @include phone {
+          transform: translate(-50%, -50%) rotate(100deg) scale(0.25);
+        }
+        width: 96px;
+        height: 96px;
+        content: url('./icons/phone-icon-color-big.png');
       }
       &:hover::before {
-        transform: translate(-50%, -50%) scale(1.05);
+        transform: translate(-50%, -50%) scale(0.5);
+        @include tablet {
+          transform: translate(-50%, -50%) scale(0.35);
+        }
+        @include phone {
+          transform: translate(-50%, -50%) scale(0.25);
+        }
         transition: .2s;
       }
       &:hover {
@@ -109,13 +121,25 @@
         position: absolute;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%) rotate(100deg);
-        width: 32px;
-        height: 32px;
-        content: url('./icons/reject-big.png');
+        transform: translate(-50%, -50%) rotate(100deg) scale(0.5);
+        @include tablet {
+          transform: translate(-50%, -50%) rotate(100deg) scale(0.35);
+        }
+        @include phone {
+          transform: translate(-50%, -50%) rotate(100deg) scale(0.25);
+        }
+        width: 96px;
+        height: 96px;
+        content: url('./icons/phone-icon-red-big.png');
       }
       &:hover::before {
-        transform: translate(-50%, -50%) scale(1.05) rotate(135deg);
+        transform: translate(-50%, -50%) rotate(135deg) scale(0.5);
+        @include tablet {
+          transform: translate(-50%, -50%) rotate(135deg) scale(0.35);
+        }
+        @include phone {
+          transform: translate(-50%, -50%) rotate(135deg) scale(0.25);
+        }
         transition: .2s;
       }
       &:hover {

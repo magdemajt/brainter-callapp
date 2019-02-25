@@ -10,15 +10,29 @@
   .col-3.image {
     width: 20rem;
     height: 20rem;
+    position: relative;
+    @include phone {
+        width: 10rem;
+        height: 10rem;
+    }
+    #dropzone-image {
+      width: 20rem!important;
+      height: 20rem!important;
+      @include phone {
+        width: 10rem!important;
+        height: 10rem!important;
+      }
+    }
     img {
       position: relative;
       top: 1rem;
     }
   }
   #user-info {
-    background: #f1f1f1;
+    background: $color-secondary;
     padding: 3rem 1rem;
     border: solid 1px $border-default;
+    color: $color-blue;
     border-radius: .5rem;
     h3 {
       overflow-y: scroll;

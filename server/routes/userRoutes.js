@@ -9,7 +9,8 @@ const {
   updatePhoto,
   getImage,
   updatePassword,
-  updateUserMail
+  updateUserMail,
+  checkIfActive
 } = require('../controllers/userController');
 const {
   getUser,
@@ -18,11 +19,11 @@ const {
 } = require('../controllers/usersController');
 
 const router = express.Router();
-router.use(validateUserToken);
+router.use(validateUserToken, checkIfActive);
 /* GET users listing. */
 router.get('/auth', getAuthUser);
 router.put('/auth', updateUser);
-router.put('/auth/email', updateUserMail)
+router.put('/auth/email', updateUserMail);
 router.put('/auth/pass', updatePassword);
 router.put('/auth/tags', updateUserWithTags);
 router.post('/auth/tags', addAuthTags);

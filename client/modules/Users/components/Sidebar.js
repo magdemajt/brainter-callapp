@@ -6,10 +6,10 @@ import { translate } from 'react-polyglot';
 const ProfileSidebar = ({ sendMessage, t }) => (
   <div className="sidebar right small flex">
     <Tooltip trigger={['hover']} placement="left" overlay={t('talk.talk')}>
-      <button className="call-button" onClick={() => sendMessage(true)} />
+      <button className="call-button big" onClick={() => sendMessage(true)} />
     </Tooltip>
     <Tooltip trigger={['hover']} placement="left" overlay={t('user.sendmsg')}>
-      <button className="messageButton" onClick={() => sendMessage(false)} />
+      <button className="messageButton big" onClick={() => sendMessage(false)} />
     </Tooltip>
   </div>
 );

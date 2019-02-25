@@ -1,94 +1,41 @@
 .nav {
   position: fixed;
+  z-index: 800;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 15rem;
+  left: .5rem;;
+  right: .5rem;
+  height: 6rem;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  @media (max-width: $tablet-width) {
+    justify-content: center;
+  }
+  background: $color-secondary;
+  border-radius: 5px;
   .nav-item {
     position: relative;
-    width: 6.4rem;
-    margin: 0 1rem;
-    height: 6.4rem;
+    height: 100%;
     a {
-      position: absolute;
-      border: solid 1px black;
-      box-shadow: 2px 2px 5px black;
-      &:hover {
-        transform: scale(1.10) translateY(-3px);
-        background: $color-secondary;
-        box-shadow: 5px 5px 5px black;
-      }
-      left: 0;
-      min-width: 4.8rem;
-      min-height: 4.8rem;
-      border-radius: 50%;
-      transition: all .5s;
-      background: white;
+      font-family: "CooperHewittBook";
+      font-style: normal;
+      font-weight: 900;
+      height: 100%;
+      padding: 0 2.5rem;
+      // width: 10rem;
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      color: $color-blue;
       text-decoration: none;
-      color: black;
-    }
-    #Messages {
-      &::before {
-        position: absolute;
-        left: 50%;
-        transform: translate(-49%, -49%);
-        top: 50%;
-        width: 3.2rem;
-        height: 1.8rem;
-        content: url('./icons/message.png');
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .3s all;
+      &:hover {
+        background: $color-blue;
+        border-radius: 5px;
+        color: $color-secondary;
       }
-      &:hover::before {
-        content: url('./icons/message-color.png');
-      }
-      
-    }
-    #Settings {
-      &::before {
-        position: absolute;
-        left: 50%;
-        transform: translate(-49%, -49%);
-        top: 50%;
-        width: 2.8rem;
-        height: 3.2rem;
-        content: url('./icons/settings.png');
-      }
-      &:hover::before {
-        content: url('./icons/settings-color.png');
-      }
-      
-    }
-    #Users {
-      &::before {
-        position: absolute;
-        left: 50%;
-        transform: translate(-49%, -49%);
-        top: 50%;
-        width: 3rem;
-        height: 3.2rem;
-        content: url('./icons/users.png');
-      }
-      &:hover::before {
-        content: url('./icons/users-color.png');
-      }
-      
-    }
-    #Profile {
-      &::before {
-        position: absolute;
-        left: 50%;
-        transform: translate(-49%, -49%);
-        top: 50%;
-        width: 1.9rem;
-        height: 3.2rem;
-        content: url('./icons/profile.png');
-      }
-      &:hover::before {
-        content: url('./icons/profile-color.png');
-      }
-      
     }
     &.left {
       float: left;
@@ -97,4 +44,36 @@
       float: right;
     }
   }
+}
+#brainterLogo {
+  justify-self: flex-start;
+  text-decoration: none;
+  font-family: 'CooperHewittBook';
+  margin-left: 3%;
+  margin-right: auto;
+  height: calc(100% - .5px);
+  background: $color-blue;
+  border: 0;
+  padding: 0 .5rem;
+  // text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  border-radius: .5rem;
+  transition: .3s all;
+  #first {
+    font-size: 4.8rem;
+    color: darken($color-secondary, 15%);
+    border-radius: .5rem;
+  }
+  #second {
+    font-size: 4.2rem;
+    color: lighten($color-blue, 10%);
+  }
+  &:hover {
+    background: $color-blue;
+  }
+}
+#navProfile {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 100%;
+  margin-right: 1.5rem;
 }

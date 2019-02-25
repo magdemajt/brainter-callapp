@@ -20,6 +20,11 @@
     border-radius: .5rem;
     background: $color-blue;
     transition: .3s;
+    &.shrink {
+        @media (max-width: $desktop-width) {
+            width: 10rem;
+        }
+    }
     &:focus { 
         outline: 0;
     }
@@ -51,6 +56,18 @@
         &.disabled {
             background: $color-disabled;
             transition: none;
+        }
+    }
+    &.outline-danger {
+        border: 1px solid $color-red;
+        color: $color-red;
+        background: transparent;
+        transition: .3s;
+        &:hover:not(.disabled) {
+            box-shadow: 0 .3rem .3rem rgba($color-black, 0.7);
+            background: invert($color-red, 1);
+            color: white;
+            transform: translateY(-.3rem) scale(1.025);   
         }
     }
     &.outline-success {
@@ -102,5 +119,48 @@
     }
     &.huge {
         min-width: 35rem;
+    }
+}
+.create-btn {
+    width: 4rem;
+    margin: .5rem 0;
+    // top: .5rem;
+    @include tablet {
+        top: -.3rem;
+    }
+    @include phone {
+        top: -.4rem;
+    }
+    position: relative;
+    height: 4rem;
+    border-radius: 50%;
+    background: transparent;
+    transition: all .5s;
+    border: solid transparent 1px;
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.33);
+        @include tablet {
+          transform: translate(-50%, -50%) scale(0.22);
+        }
+        @include phone {
+          transform: translate(-50%, -50%) scale(0.15);
+        }
+        width: 96px;
+        height: 96px;
+        content: url('./icons/create-btn.png');
+    }
+    &:focus {
+        outline: 0;
+    }
+    &:hover::before {
+        width: 96px;
+        height: 96px;
+        content: url('./icons/create-btn-sec.png');
+    }
+    &:hover {
+        cursor: pointer;
     }
 }

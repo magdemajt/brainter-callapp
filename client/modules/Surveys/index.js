@@ -87,7 +87,7 @@ class Surveys extends Component {
   render() {
     if (this.state.talks.length > 0) {
       return (
-        <div className="container fluid offset-15 height-60 flex ml-1-5">
+        <div className="container fluid offset-8 height-60 flex ml-1-5">
           <div className="card font-16">
             <div className="col-3">
               <SurveySelection edited={this.state.edited} talks={this.state.talks} currentId={this.state.selectedTalk._id} onChangeCurrent={this.changeSelectedTalk} />
@@ -106,14 +106,18 @@ class Surveys extends Component {
                 onChangeComment={this.changeComment}
               />
             </div>
-            <div className="row justify-center">
+            <div className="row-5 justify-center">
               <button type="button" onClick={this.finishSurvey} className={this.state.selectedTalk._id !== undefined ? 'btn' : 'btn disabled'}>Confirm</button>
             </div>
           </div>
         </div>
       );
     }
-    return null;
+    return (
+      <div className="container center offset-8" style={{ fontSize: '1.6rem', fontFamily: 'CooperHewittBold' }}>
+        No surveys to answer
+      </div>
+    );
   }
 }
 

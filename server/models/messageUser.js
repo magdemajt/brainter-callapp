@@ -13,7 +13,7 @@ messageUserSchema.statics.findMessageUsers = function (user, part, callback) {
   return this.find({ participants: { $elemMatch: { $eq: user } } })
     .sort('+updatedAt')
     .limit(15)
-    .skip(part)
+    .skip(part * 15)
     .populate({ path: 'participants', select: 'name' })
     .populate({
       path: 'messages',
@@ -23,6 +23,13 @@ messageUserSchema.statics.findMessageUsers = function (user, part, callback) {
       }
     })
     .then(callback);
+};
+messageUserSchema.statics.findAllMessageUsers = function (user, callback) {
+  return this.find({ participants: { $elemMatch: { $eq: user }, $size: 2 } })
+    .sort('+updatedAt')
+    .populate({ path: 'participants', select: 'name' })
+    .then(callback)
+    .catch(err => console.log(err));
 };
 messageUserSchema.statics.findMessages = function (messageUser, part, callback) {
   return this.findById(messageUser)
@@ -41,7 +48,7 @@ messageUserSchema.statics.addMessage = function (messageUser, message, callback)
     .then(callback);
 };
 messageUserSchema.statics.createOrReturn = function (participants, requester, callback) {
-  return this.find({ participants: { $all: participants } }).populate('participants').sort('-updatedAt')
+  return this.find({ participants }).populate('participants').sort('-updatedAt')
     .populate({
       path: 'messages',
       options: {

@@ -1,4 +1,4 @@
-const { validateUserTokenSockets } = require('../controllers/userController');
+const { validateUserTokenSockets, userNotActive, checkIfActiveSockets } = require('../controllers/userController');
 const {
   handleIncomingCall,
   createNewCall,
@@ -16,7 +16,13 @@ const {
   searchTeacher,
   searchTalks,
   selectTalk,
-  cancelTalk
+  cancelTalk,
+  searchTeacherMulti,
+  leaveMultiRoom,
+  destroyMultiTalk,
+  joinMultiRoom,
+  startMultiTalk,
+  createMultiTalk
 } = require('../controllers/lessonController');
 const {
   createNewMessage,
@@ -27,11 +33,13 @@ const {
 } = require('../controllers/messageController');
 
 const {
-  getRecommendedUsers
+  getRecommendedUsers,
+  findUsers
 } = require('../controllers/usersController');
 
 module.exports = (io) => {
   io.use(validateUserTokenSockets);
+  io.use(checkIfActiveSockets);
 
   io.on('connection', (socket) => {
     socket.join(`room_${socket.authUser._id}`);
@@ -42,10 +50,19 @@ module.exports = (io) => {
     socket.on('finish_call_client', data => finishCall(io, socket, data));
     socket.on('answer_call_client', data => answerCall(io, socket, data));
     socket.on('get_surveys', data => userSurveys(io, socket, data));
+    // single teacher talk listeners
     socket.on('search_teacher', data => searchTeacher(io, socket, data));
     socket.on('search_talks', data => searchTalks(io, socket, data));
     socket.on('cancel_teacher_talk', data => cancelTalk(io, socket, data));
     socket.on('select_talk', data => selectTalk(io, socket, data));
+    // multi teacher talk listeners
+    socket.on('search_multi_talk', data => searchTeacherMulti(io, socket, data));
+    socket.on('leave_multi_room', data => leaveMultiRoom(io, socket, data));
+    socket.on('join_multi_room', data => joinMultiRoom(io, socket, data));
+    socket.on('create_multi_talk', data => createMultiTalk(io, socket, data));
+    socket.on('start_multi_talk', data => startMultiTalk(io, socket, data));
+    socket.on('destroy_multi_talk', data => destroyMultiTalk(io, socket, data));
+    //
     socket.on('finish_survey', data => finishSurvey(io, socket, data));
     socket.on('incoming_call', data => handleIncomingCall(io, socket, data));
     socket.on('create_peer_connection', data => createPeerConnection(io, socket, data));
@@ -56,5 +73,7 @@ module.exports = (io) => {
     socket.on('get_message_users', data => getMessageUsers(io, socket, data));
     socket.on('get_messages', data => getMessages(io, socket, data));
     socket.on('begin_chat', data => beginChat(io, socket, data));
+    socket.on('find_users', data => findUsers(io, socket, data));
+    socket.on('disconnect', data => userNotActive(io, socket, data));
   });
 };

@@ -12,34 +12,34 @@ const SurveyInputs = ({ t, knowledge = 0, onChangeKnowledge, culture = 0, onChan
   });
   return (
     <React.Fragment>
-      <div className="row">
+      <div className="row-5">
         {t('survey.knowledge')}
       </div>
-      <div className="row">
+      <div className="row-5">
         <select className="select horizontal" value={knowledge} onChange={(e) => onChangeKnowledge(e.target.value)}>
           {options}
         </select>
       </div>
-      <div className="row">
+      <div className="row-5">
         {t('survey.culture')}
       </div>
-      <div className="row">
+      <div className="row-5">
         <select className="select horizontal" value={culture} onChange={(e) => onChangeCulture(e.target.value)}>
           {options}
         </select>
       </div>
-      <div className="row">
+      <div className="row-5">
         {t('survey.teaching')}
       </div>
-      <div className="row">
+      <div className="row-5">
         <select className="select horizontal" value={teaching} onChange={(e) => onChangeTeaching(e.target.value)}>
           {options}
         </select>
       </div>
-      <div className="row">
+      <div className="row-5">
         {t('survey.lesson')}
       </div>
-      <div className="row">
+      <div className="row-5">
         <select className="select horizontal" value={lesson} onChange={(e) => onChangeLesson(e.target.value)}>
           {options}
         </select>

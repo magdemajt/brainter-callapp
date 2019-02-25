@@ -14,6 +14,9 @@ const userSchema = new Schema({
     level: { type: 'Number', default: 0 },
   }],
   token: { type: 'String', default: '', select: false },
+  active: { type: 'Boolean', default: false },
+  inCall: { type: 'Boolean', default: false },
+  personalityType: { type: 'Number' }, // Introvertic - 0 or extravertic - 1
   password: { type: 'String', select: false },
   desc: { type: 'String', default: '' },
   photo: { data: String, contentType: String },

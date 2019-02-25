@@ -6,7 +6,9 @@ class NavMenuItem extends React.Component {
   render() {
     return (
       <div className="nav-item">
-        <Link to={this.props.location} id={this.props.locationName} onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}/>
+        <Link to={this.props.location} id={this.props.locationName} onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}>
+          {this.props.locationName}
+        </Link>
       </div>
     );
   }

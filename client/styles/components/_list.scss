@@ -3,16 +3,30 @@
   overflow-y: scroll;
   overflow-x: hidden;
   .list-el {
+    color: $color-blue;
+    font-family: "CooperHewittBook";
     min-width: 10rem;
     min-height: 3rem;
+    border-radius: .5rem;
     text-align: center;
     font-size: 1.6rem;
-    border: 1px solid grey;
+    transition: .3s all;
     button {
       float: right;
     }
+    &:hover {
+      background: $color-secondary;
+      cursor: pointer;
+    }
     &:not(:first-child) {
       border-top: 0;
+    }
+  }
+  .selected-el {
+    color: $color-secondary;
+    background: $color-blue;
+    &:hover {
+      color: $color-blue;
     }
   }
 }

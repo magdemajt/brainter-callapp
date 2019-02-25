@@ -9,17 +9,15 @@ import { connect } from 'react-redux';
 
 const Blackboard = ({
   text, changeText, caller
-}) => {
-  return (
-    <React.Fragment>
-      {caller ? (
-      <textarea value={text} onChange={changeText} />) : (
-      <h3>
-        {text}
-      </h3>)}
-    </React.Fragment>
-  );
-};
+}) => (
+  <div id="blackboard">
+    {caller ? (
+      <textarea value={text} onChange={changeText} className="blackboard-input" />) : (
+        <h3 className="blackboard-text">
+            {text}
+          </h3>)}
+  </div>
+);
 
 // Retrieve data from store as props
 const mapStateToProps = state => ({

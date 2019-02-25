@@ -32,9 +32,9 @@ class UserProfile extends Component {
 
   render() {
     return (
-      <div className="container center offset-15 fluid height-60 flex">
+      <div className="container center offset-8 fluid height-60 flex">
         <div className="card">
-          <div className="row">
+          <div className="row-5">
             <ProfileIcon user={this.state.user} editing={false} />
             <UserDescription user={this.state.user} editing={false} />
           </div>

@@ -22,9 +22,9 @@ class Login extends Component {
 
   render() {
     return (
-      <div className="container center">
+      <div className="container center offset-8">
         <LoginInput />
-        <button onClick={() => { history.push('/register') ;}} className="btn secondary">Register</button>
+        <button onClick={() => { history.push('/register'); }} className="btn secondary">Register</button>
       </div>
     );
   }

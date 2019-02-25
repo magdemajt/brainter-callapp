@@ -19,6 +19,9 @@ const socketReducers = (oldState = initialState, action) => {
     case 'INIT_P2P': {
       return Object.assign({}, state, { p2p: new Peer(action.opts) });
     }
+    case 'RESET': {
+      return initialState;
+    }
     default:
       return state;
   }

@@ -40,7 +40,7 @@ const UserTags = ({
     });
   }
   return (
-    <div className="row">
+    <div className="row-5">
       <div className="col-10">
         <ul className="tags-list">
           {editingContent}

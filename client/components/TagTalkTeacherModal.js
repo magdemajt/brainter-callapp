@@ -48,7 +48,7 @@ class TagTalkTeacherModal extends React.Component {
         {tags}
         {30 - (this.props.dateDifference + this.state.dateNow - talk.createdAt) / 1000} 
         {/* Nie wiem czy działa */}
-        <button className="btn xsm" type="button" onClick={() => this.selectTalk(talk)}>Teach</button>
+        <button className="btn xsm" type="button" onClick={() => this.selectTalk(talk)}>{this.props.multi ? 'Learn' : 'Teach'}</button>
         </li>
       );
     });
@@ -62,33 +62,25 @@ class TagTalkTeacherModal extends React.Component {
   };
 
   selectTalk = (talk) => {
-    this.props.socket.emit('select_talk', { talk });
+    if (this.props.multi) {
+      this.props.socket.emit('join_multi_room', { talk });
+    } else {
+      this.props.socket.emit('select_talk', { talk });
+    }
   }
 
   render () {
     const props = this.props;
-    if (this.props.clearState && (this.state.topic !== '' || this.state.confirmed)) {
-      this.clearState();
-      this.props.editClear(false);
-    }
-    const modalConfirm = (
-      <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.startCall')} >
-        <button id="modalAnswerButton" onClick={() => {  }} >
-          <i className="border" /> 
-        </button>
-      </Tooltip>
-    );
     const modalCancel = (
       <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
-        <button id="modalRejectButton" onClick={() => { props.initTeacherTalks([]); }}>
+        <button id="modalRejectButton" onClick={() => { props.initTeacherTalks([]); this.props.closeModal() }}>
           <i className="border" />
         </button>
       </Tooltip>
     );
     const talks = this.generateTalks();
     return (
-      <Modal modalHeader={'Available talks'} calling={true} cancelButton={modalCancel} confirmButton={!this.state.confirmed ? modalConfirm: null} opened={this.props.opened}>
-            Enter tags of the talk
+      <Modal modalHeader={'Available talks'} calling={true} cancelButton={modalCancel} confirmButton={null} opened={this.props.opened}>
             <ul className="list" style={{maxHeight: '6.5rem'}}>
               {talks}
             </ul>

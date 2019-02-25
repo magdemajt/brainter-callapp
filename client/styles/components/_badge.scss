@@ -1,9 +1,21 @@
 .badge {
-  width: 2rem;
+  width: 3rem;
   float: right;
-  height: 2rem;
-  border: 1px solid black;
+  display: flex;
+  position: relative;
+  top: -.5rem;
+  justify-content: center;
+  align-items: center;
+  height: 3rem;
+  background: $color-blue;
+  color: $color-secondary;
   border-radius: 50%;
+  &.small {
+    font-size: 1.2rem;
+    width: 2rem;
+    height: 2rem;
+    top: 0;
+  }
   &.rookie {
     background: $color-success;
     border-color: $color-success;

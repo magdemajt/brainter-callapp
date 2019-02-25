@@ -15,7 +15,10 @@ const SearchUserByName = ({
     .filter(user => user.name.includes(filter))
     .map((user) => (
       <li key={user._id} className="flex-el">
-          <img src={`/api/user/photo/${user._id}`} alt="Profile image" />
+          <div style={{position: 'relative' }}>
+            <img src={`/api/user/photo/${user._id}`} />
+            <span className={user.active ? 'user-active small' : 'user-active small not'}></span>
+          </div>
           {user.name}
           <div>
             <button className="view-profile-button" onClick={() => viewUserProfile(user._id)} />
@@ -29,7 +32,7 @@ const SearchUserByName = ({
   return (
     <React.Fragment>
       <input className="input" type="text" placeholder="Enter name..." onChange={e => initFilter(e.target.value)} />
-      <div className="scroll-y" style={{width: '100%', height: '100%'}}>
+      <div className="scroll-y" style={{ width: '100%', height: '100%' }}>
         <ul className="users-list">
           {mappedUsers}
         </ul>

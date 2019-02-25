@@ -19,30 +19,12 @@ class Register extends React.Component {
         switch (e.target.name) {
             case 'emailInput': {
                 this.setState({ email: input });
-                break;
-            }
-            case 'nameInput': {
-              this.setState({ name: input });
-              break;
-            }
-            case 'passwordInput': {
-                this.setState({ password: input });
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-    handleBlur = (e) => {
-        switch (e.target.name) {
-            case 'emailInput': {
-                checkIfEmailAvailable(this.state.email, (response) => {
+                checkIfEmailAvailable(input, (response) => {
                     if (!response.data) {
                         this.setState({emailError: 'Email already taken'});
                     }
                 });
-                if (!validateEmail(this.state.email)) {
+                if (!validateEmail(input)) {
                   this.setState({emailError: 'Invalid email'});
                 } else {
                     this.setState({emailError: ''});
@@ -50,20 +32,24 @@ class Register extends React.Component {
                 break;
             }
             case 'nameInput': {
-                if (!validateName(this.state.name)) {
-                    this.setState({nameError: 'Invalid name'});
+                this.setState({ name: input });
+                if (!validateName(input)) {
+                this.setState({nameError: 'Invalid name'});
                 } else {
                     this.setState({nameError: ''});
                 }
               break;
             }
             case 'passwordInput': {
-                if (!validatePassword(this.state.password)) {
-                    console.log(this.state.password)
-                    this.setState({passError: 'Password must contain minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character'});
+                this.setState({ password: input });
+                if (!validatePassword(input)) {
+                    this.setState({passError: 'Password must contain minimum eight characters, at least one letter and one number.'});
                 } else {
                     this.setState({passError: ''});
                 }
+                break;
+            }
+            default: {
                 break;
             }
         }
@@ -86,33 +72,29 @@ class Register extends React.Component {
     render () {
         const { emailError, nameError, passError } = this.state;
         return (
-            <div className="container center">
+            <div className="container center offset-8">
                 <div className="form">
-                  <input type="text" placeholder="Enter your email..." id="emailInput" onChange={this.handleChange} onBlur={this.handleBlur} name="emailInput" className="input" />
+                  <input type="email" placeholder="Enter your email..." id="emailInput" onChange={this.handleChange} name="emailInput" className="input" />
                     {emailError ? 
                     <div>
                         <span className="warning-input-text">{emailError}</span>
                         <span className="warning-input-icon"><i className="icon warning"/></span>
                     </div> : null}
-                  <input type="text" placeholder="Enter your name..." id="nameInput" onChange={this.handleChange} onBlur={this.handleBlur} name="nameInput" className="input" />
+                  <input type="text" placeholder="Enter your name..." id="nameInput" onChange={this.handleChange} name="nameInput" className="input" />
                   {nameError ? 
                     <div>
                         <span className="warning-input-text">{nameError}</span>
                         <span className="warning-input-icon"><i className="icon warning"/></span>
                     </div> : null}
-                  <input type="password" placeholder="Enter your password..." id="passwordInput" onChange={this.handleChange} onBlur={this.handleBlur} name="passwordInput" className="input" />
+                  <input type="password" placeholder="Enter your password..." id="passwordInput" onChange={this.handleChange} name="passwordInput" className="input" />
                   {passError ? 
                     <div>
                         <span className="warning-input-text">{passError}</span>
                         <span className="warning-input-icon"><i className="icon warning"/></span>
                     </div> : null}
-                    {this.checkIfInputsCorrect() ? 
                     <button className="btn float-right" onClick={this.handleClick}>
                         Register
-                    </button> : 
-                    <button className="btn disabled float-right">
-                        Register
-                    </button>}
+                    </button>
                 </div>
             </div>
         );

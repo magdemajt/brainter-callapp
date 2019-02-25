@@ -23,6 +23,7 @@
   }
   &.height-60 {
     height: 60vh;
+    
   }
   &.center {
     margin: auto;
@@ -36,11 +37,16 @@
       justify-content: space-between;
     }
   }
-  &.offset-15 {
-    top: 15rem;
+  &.offset-8 {
+    top: 8rem;
   }
   &.full {
-    min-width: 100vw;
+    min-width: calc(100vw - 2rem);
+  }
+  &.hm {
+    min-height: calc(100vh - 8rem);
+    height: calc(100vh - 8rem);
+    overflow-y: auto;
   }
   &.full-70 {
     min-width: 70vw;
@@ -102,6 +108,11 @@
 }
 .row {
   width: 100%;
+  height: 100%;
+  @include display-flex;
+}
+.row-max {
+  width: 100vw;
   @include display-flex;
 }
 .scroll-y {
@@ -121,6 +132,12 @@
 }
 .ml-20 {
   margin-left: 20rem;
+  @include tablet {
+    margin-left: 15rem;
+  }
+  @include phone {
+    margin-left: 5rem;
+  }
 }
 .ml-1-5 {
   margin-left: 1.5rem;
@@ -142,4 +159,25 @@
 }
 .font-16 {
   font-size: 1.6rem;
+}
+.w-30 {
+  min-width: 30%;
+  width: 30%;
+}
+.w-40 {
+  min-width: 40%;
+  width: 40%;
+}
+.w-65 {
+  min-width: 65%;
+  width: 65%;
+}
+.h-con {
+  min-height: $container-height;
+  height: $container-height;
+}
+.no-small-screen {
+  @media (max-width: $desktop-width) {
+    display: none;
+  }
 }

@@ -116,7 +116,7 @@ class Admin extends Component {
       // }
     }
     return (
-      <div className="container fluid offset-15 flex ml-1-5 height-60">
+      <div className="container fluid offset-8 flex ml-1-5 height-60">
         <div className="card">
           {this.state.currentView > 0 ? <Timepicker changeTime={this.changeTime} value={this.state.time} /> : null}
           {view}
