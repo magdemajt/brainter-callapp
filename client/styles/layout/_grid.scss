@@ -125,9 +125,8 @@
 .column {
   flex-direction: column;
   &.expanded {
-    height: 50vh;
-    justify-content: flex-start;
-    
+    height: initial;
+    justify-content: flex-start; 
   }
 }
 .ml-20 {

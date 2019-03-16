@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import history from '../history';
-import VideoPlayerSmall from '../modules/Talk/components/VideoPlayerSmall';
-import BlackboardSmall from '../modules/Talk/components/BlackboardSmall';
-import { withRouter } from 'react-router-dom';
+import Blackboard from './components/Blackboard';
+import VideoPlayer from './components/VideoPlayer';
+import history from '../../history';
 // Import Style
 
 
@@ -11,7 +10,7 @@ import { withRouter } from 'react-router-dom';
 var usedSignaling = false;
 // Import Actions
 
-class CallWindow extends Component {
+class Talk extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,7 +20,10 @@ class CallWindow extends Component {
       usedSignaling: false,
       leftToConnect: 1,
       shown: true,
+      remoteStreams: []
     };
+    this.p2ps = [];
+    this.queuedPeers = [];
   }
 
   componentDidMount() {
@@ -37,16 +39,28 @@ class CallWindow extends Component {
         audio: true
       };
       try {
+        this.props.socket.on('got_receiver_stream', (data2) => {
+          if (this.props.localStream === null) {
+            this.queuedPeers.push(data2._id);
+          } else {
+            const peer = {
+              _id: data2._id,
+              peer: new Peer({initiator: true, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000}) 
+            };
+            this.setPeerListeners(peer);
+            peer.peer.on('signal', (data) => {
+              this.props.socket.emit('create_peer_connection', { peer: data, messageUser: this.props.talk.messageUser, _id: peer._id });
+            });
+            this.p2ps.push(peer);
+          }
+          
+
+          ///////////////////////////////
+        });
         if (this.props.creator) {
-          this.props.socket.on('got_receiver_stream', () => {
-            if (this.state.leftToConnect === 1) {
-              this.getMediaCreator(constraints, false);
-            } else {
-              this.setState({ leftToConnect: this.state.leftToConnect - 1 });
-            }
-          });
+          this.getMediaCreator(constraints, false);
         } else {
-          this.getMedia(constraints, false);
+          this.getMediaCreator({ video: false, audio: true }, false);
         }
       } catch (e) {
         this.clearCall();
@@ -54,10 +68,20 @@ class CallWindow extends Component {
     }
   }
 
-  /* eslint-disable */
   getMediaCreator = (constraints, error = false) => {
     navigator.mediaDevices.getUserMedia(constraints).then((localStream) => {
       if(this.props.localStream === null) {
+        this.queuedPeers.forEach(id => {
+          const peer = {
+            _id: id,
+            peer: new Peer({initiator: true, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000}) 
+          };
+          this.setPeerListeners(peer);
+          peer.peer.on('signal', (data) => {
+            this.props.socket.emit('create_peer_connection', { peer: data, messageUser: this.props.talk.messageUser, _id: peer._id });
+          });
+          this.p2ps.push(peer);
+        });
         this.props.initLocal(localStream);
         this.sendSignalingData(localStream);
       }
@@ -94,34 +118,36 @@ class CallWindow extends Component {
     this.props.socket.on('got_token', (data) => {
       console.log('Got_token')
       const ices = data.ices;
-      this.props.initP2P({ initiator: this.props.creator, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000  });
-      this.setPeerListeners();
       if (this.props.creator) {
-        console.log('Creatoir');
         this.props.socket.on('peer_connection', (peerData) => {
           console.log(peerData.peer)
-          this.setState({localPeer: peerData.peer});
-          this.props.p2p.signal((peerData.peer));
-          console.log('Signalled');
-        });
-        this.props.p2p.on('signal', (data) => {
-          this.props.socket.emit('create_peer_connection', { peer: data, messageUser: this.props.talk.messageUser });
+          if (peerData._id === this.props.authUser._id) {
+            this.p2ps.find(p => p._id === peerData.auth).peer.signal((peerData.peer));
+            console.log('Signalled');
+          }
         });
       } else {
-        this.props.socket.emit('receiver_stream', {messageUser: this.props.talk.messageUser});
-        this.props.p2p.on('signal', (localPeer) => {
-          console.log('Zwrotny');
-          this.props.socket.emit('peer_connection', { messageUser: this.props.talk.messageUser, peer: localPeer });
-          if(this.state.localPeer === null) {
-            this.setState({localPeer});
+        this.p2ps.push({_id: this.props.talk.caller, peer: new Peer({initiator: false, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000}) })
+        this.setPeerListeners(this.p2ps[0]);
+        this.props.talk.participants.filter(part => part !== this.props.talk.caller).forEach(part => {
+          if (this.props.authUser._id < part) {
+            const peer = {
+              _id: part,
+              peer: new Peer({initiator: this.props.authUser._id > part, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000}) 
+            };
+            this.setPeerListeners(peer);
+            this.props.socket.emit('receiver_stream', {messageUser: this.props.talk.messageUser});
+            peer.peer.on('signal', (localPeer) => {
+              console.log('Zwrotny');
+              this.props.socket.emit('peer_connection', { messageUser: this.props.talk.messageUser, peer: localPeer, _id: peer._id });
+            });
+            this.p2ps.push(peer);
           }
-      });
+        });
         this.props.socket.on('create_peer_connection', (data) => {
-          if(this.state.remotePeer === null) {
-            this.setState({ remotePeer: data.peer });
+          if (this.props.authUser._id === data._id) {
+            this.p2ps.find(p => p._id === data.auth).peer.signal((peerData.peer));
           }
-          console.log('createPeer');
-          this.props.p2p.signal(data.peer);
         });
       }
     });
@@ -129,34 +155,35 @@ class CallWindow extends Component {
   }
   /* eslint-enable */
 
-  setPeerListeners() {
-    this.props.p2p.on('stream', (stream) => {
-      this.props.initRemote(stream);
+  setPeerListeners(peerObject) {
+    const peer = peerObject.peer;
+    peer.on('stream', (stream) => {
+      this.setState({ remoteStreams: this.state.remoteStreams.filter(s => s._id !== peerObject._id).concat({ _id: peerObject._id, stream })});
     });
-    this.props.p2p.on('connect', () => {
+    peer.on('connect', () => {
       console.log('Połączono przez webRTC');
     });
-    this.props.p2p.on('error', (err) => {
+    peer.on('error', (err) => {
       console.log('WebRTC bład', err);
-      this.clearCall();
+      this.clearCall(peerObject);
     });
-    this.props.p2p.on('data', (sendData) => {
+    peer.on('data', (sendData) => {
       const data = JSON.parse(sendData);
       switch (data.type) {
         case 'MUTE_REMOTE': 
-          this.props.remoteStream.getAudioTracks()[0].enabled = false;
+          this.state.remoteStreams.find(s => s._id === peerObject._id).stream.getAudioTracks()[0].enabled = false;
           break;
         case 'UNMUTE_REMOTE': 
-          this.props.remoteStream.getAudioTracks()[0].enabled = true;
+          this.state.remoteStreams.find(s => s._id === peerObject._id).stream.getAudioTracks()[0].enabled = true;
           break;
         case 'MUTE_VIDEO': 
-          this.props.remoteStream.getVideoTracks()[0].enabled = false;
+          this.state.remoteStreams.find(s => s._id === peerObject._id).stream.getVideoTracks()[0].enabled = false;
           break;
         case 'UNMUTE_VIDEO':
-          this.props.remoteStream.getVideoTracks()[0].enabled = true;
+          this.state.remoteStreams.find(s => s._id === peerObject._id).stream.getVideoTracks()[0].enabled = true;
           break;
         case 'END_CALL': 
-          this.clearCall();
+          this.clearCall(peerObject);
           break;
         case 'BLACKBOARD_TEXT':
           this.props.editBlackboard(data.blackboardText);
@@ -164,10 +191,10 @@ class CallWindow extends Component {
       }
       console.log(data);
     });
-    this.props.p2p.on('close', () => {
-      this.clearCall();
+    peer.on('close', () => {
+      this.clearCall(peerObject);
     });
-    this.props.p2p.on('track', (track, stream) => {
+    peer.on('track', (track, stream) => {
       stream.addTrack(track);
       console.log('AddedTrack')
       this.props.initRemote(stream);
@@ -175,23 +202,31 @@ class CallWindow extends Component {
   }
 
   muteLocalOutcoming = () => {
-    this.props.p2p.send(JSON.stringify({ type: 'MUTE_REMOTE' }));
+    this.p2ps.forEach(peer => {
+      peer.peer.send(JSON.stringify({ type: 'MUTE_REMOTE' }));
+    });
     // this.setState({localAudio: this.state.localStream.getAudioTracks()[0].clone()});
     // this.props.p2p.removeTrack(this.state.localStream.getAudioTracks()[0], this.state.localStream);
   }
   unmuteLocalOutcoming = () => {
-    this.props.p2p.send(JSON.stringify({ type: 'UNMUTE_REMOTE' }));
+    this.p2ps.forEach(peer => {
+      peer.peer.send(JSON.stringify({ type: 'UNMUTE_REMOTE' }));
+    });
     // this.props.p2p.addTrack(this.state.localAudio, this.state.localStream);
     // this.state.localStream.addTrack(this.state.localAudio);
     // console.log('AddedTrackEvent')
   }
 
   muteVideo = () => {
-    this.props.p2p.send(JSON.stringify({ type: 'MUTE_VIDEO' }));
+    this.p2ps.forEach(peer => {
+      peer.peer.send(JSON.stringify({ type: 'MUTE_VIDEO' }));
+    });
   }
 
   unmuteVideo = () => {
-    this.props.p2p.send(JSON.stringify({ type: 'UNMUTE_VIDEO' }));
+    this.p2ps.forEach(peer => {
+      peer.peer.send(JSON.stringify({ type: 'UNMUTE_VIDEO' }));
+    });
   }
 
   clearCall = () => {
@@ -222,16 +257,12 @@ class CallWindow extends Component {
   }
 
   render() {
-    if (this.props.location.pathname !== '/talk' && this.props.location.pathname !== '/profile') {
-      return (
-        <div className="talk-window">
-          <VideoPlayerSmall localStream={this.props.localStream} remoteStream={this.props.remoteStream} onEndCall={this.endCall} muteLocal={this.muteLocalOutcoming} unmuteLocal={this.unmuteLocalOutcoming} muteVideo={this.muteVideo} unmuteVideo={this.unmuteVideo}/> 
-          <BlackboardSmall text={this.props.blackboardText} changeText={this.changeText} caller={this.props.authUser._id === this.props.talk.caller} /> 
-        </div>
-      );
-    } else {
-      return null;
-    }
+    return (
+      <div className="container center fluid offset-8 hm flex justify-center">
+        <VideoPlayer localStream={this.props.localStream} remoteStream={this.props.remoteStream} onEndCall={this.endCall} muteLocal={this.muteLocalOutcoming} unmuteLocal={this.unmuteLocalOutcoming} muteVideo={this.muteVideo} unmuteVideo={this.unmuteVideo}/> 
+        <Blackboard text={this.props.blackboardText} changeText={this.changeText} caller={this.props.authUser._id === this.props.talk.caller} /> 
+      </div>
+    );
   }
 }
 
@@ -243,9 +274,9 @@ const mapStateToProps = state => ({
   messageUsers: state.messages.messageUsers,
   p2p: state.io.p2p,
   talk: state.talk.talk,
-  creator: state.talk.creator,
-  localStream: JSON.parse(state.talk.localStream),
-  remoteStream: JSON.parse(state.talk.remoteStream),
+  creator: state.talk.talk.caller === state.userData.user._id,
+  localStream: (state.talk.localStream),
+  remoteStream: (state.talk.remoteStream),
   blackboardText: state.talk.blackboardText
 });
 /* eslint-disable */
@@ -278,4 +309,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 /* eslint-enable */
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CallWindow));
+export default connect(mapStateToProps, mapDispatchToProps)(Talk);
