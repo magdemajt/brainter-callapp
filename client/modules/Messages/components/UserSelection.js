@@ -24,7 +24,7 @@ const UserSelection = ({
     // const newMsgs = [];
     const newMsgs = newMessages(messageUser);
     return (
-      <li key={messageUser._id} onClick={() => onSelect(messageUser, newMsgs)} className={userM.hasOwnProperty('_id') && userM._id === messageUser._id ? 'active' : ''}>
+      <li key={messageUser._id} onClick={() => onSelect(messageUser, newMsgs)} className={userM && userM.hasOwnProperty('_id') && userM._id === messageUser._id ? 'active' : ''}>
         {/* <img src={messageUser.photo.data} alt="User profile image" /> */}
         {names(messageUser.participants)}
         {newMsgs.length > 0 ? <span className="badge small">{newMsgs.length < 10 ? newMsgs.length : '+9'}</span> : null}

@@ -26,6 +26,7 @@ class Messages extends Component {
     };
     this.listRef = React.createRef();
     this.updatingMessageUsers = false;
+    this.checkedURL = false;
   }
   openMessagesIfRouteUser () {
     return this.props.messageUsers.find(mu => {
@@ -45,17 +46,24 @@ class Messages extends Component {
       return false;
     });
   }
-  componentDidMount() {
-    if (this.props.match.params.id !== '0') {
+  checkURL () {
+    if (!this.checkedURL && this.props.messageUsers.length > 0 && this.props.match.params.id !== '0') {
+      console.log('Coś się dzieje')
       const chosenUser = this.openMessagesIfRouteUser();
       if (this.props.match.params.talking === 'true') {
+        console.log(chosenUser)
         this.props.startCalling(chosenUser._id);
       } else {
         this.onSelect(chosenUser);
       }
+      this.checkedURL = true;
     }
   }
+  componentDidMount () {
+    this.checkURL();
+  }
   componentDidUpdate (prevProps) {
+    this.checkURL();
     if (prevProps.user.hasOwnProperty('messages') && this.props.user.hasOwnProperty('messages') && this.props.user.messages.length > prevProps.user.messages.length) {
       const newUnsorted = (_.chunk(this.props.user.messages, prevProps.user.messages.length)[1]);
       const newMsgs =_.filter(newUnsorted, o => o.sender !== this.props.authUser._id && !o.seen.find(user => user === this.props.authUser._id));
@@ -113,7 +121,7 @@ class Messages extends Component {
 const mapStateToProps = state => ({
   messageUsers: state.messages.messageUsers,
   authUser: state.userData.user,
-  user: state.messages.user,
+  user: state.messages.user || { participants: [] },
   socket: state.io.socket
 });
 /* eslint-disable */

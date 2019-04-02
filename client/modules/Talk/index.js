@@ -103,13 +103,13 @@ class Talk extends Component {
           console.log('Signalled');
         });
         this.props.p2p.on('signal', (data) => {
-          this.props.socket.emit('create_peer_connection', { peer: data, messageUser: this.props.talk.messageUser });
+          this.props.socket.emit('create_peer_connection', { peer: data, messageUser: this.props.talk.messageUser, _id: '' });
         });
       } else {
         this.props.socket.emit('receiver_stream', {messageUser: this.props.talk.messageUser});
         this.props.p2p.on('signal', (localPeer) => {
           console.log('Zwrotny');
-          this.props.socket.emit('peer_connection', { messageUser: this.props.talk.messageUser, peer: localPeer });
+          this.props.socket.emit('peer_connection', { messageUser: this.props.talk.messageUser, peer: localPeer, _id: '' });
           if(this.state.localPeer === null) {
             this.setState({localPeer});
           }

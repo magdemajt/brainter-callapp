@@ -3,10 +3,9 @@ const User = require('../models/user');
 const MessageUser = require('../models/messageUser');
 
 exports.beginChat = (io, socket, data) => {
-  const participants = data.participants.find(part => part === socket.authUser._id) !== undefined ? data.participants : data.participants.concat(socket.authUser._id);
-  MessageUser.createOrReturn(participants, socket.authUser._id, (messageUsers) => {
-    // Poprawić na messageUser, gdzie jest dwóch użytkowników
-    socket.emit('message_user_new', { messageUser: messageUsers[0], talk: data.talk });
+  const participants = data.participants.filter(part => part.toString() !== socket.authUser._id.toString()).concat(socket.authUser._id.toString());
+  MessageUser.createOrReturn(participants, socket.authUser._id, (messageUser) => {
+    socket.emit('message_user_new', { messageUser: messageUser[0], talk: data.talk });
   });
 };
 exports.createNewMessage = (io, socket, data) => {
