@@ -40,7 +40,7 @@ class MultiTalkTeacherModal extends React.Component {
         history.push('/users');
       });
       this.props.socket.on('started_multi_talk', (data) => {
-        //history.push('/talk');
+        history.push('/multitalk');
       });
     }
   }

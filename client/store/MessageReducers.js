@@ -52,7 +52,7 @@ const messageReducers = (oldState = initialState, action) => {
       if (state.messageUsers.find(mu => mu._id === action.messageUser._id) !== undefined) {
         return state;
       }
-      const newMu = Object.assign({}, action.messageUser);
+      const newMu = { ...action.messageUser, messages: action.messageUser.messages || [] };
       newMu.messages.reverse();
       const messageUsers = state.messageUsers.concat(newMu);
       return Object.assign({}, state, { messageUsers });

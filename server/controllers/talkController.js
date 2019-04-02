@@ -19,22 +19,22 @@ exports.createNewCall = (io, socket, data) => {
   });
   talk.save();
   MessageUser.findById(data.messageUser).then((mUser) => {
+    socket.emit('created_talk', { talk, participants: mUser.participants });
     mUser.participants.forEach((part) => {
       if (part.toString() !== socket.authUser._id.toString()) {
-        io.to(`room_${part}`).emit('incoming_call', { talk, tags: data.tags });
+        io.to(`room_${part}`).emit('incoming_call', { talk, tags: data.tags, participants: mUser.participants });
       }
     });
   }).catch((err) => {
     console.log(err);
   });
   socket.join(`talk_${data.messageUser}`);
-  socket.emit('created_talk', { talk });
 };
 
 exports.finishCall = (io, socket, data) => {
-  Talk.findOne({ _id: data.talk._id }).populate('messageUser').then(talk => {
-    const surveys = talk.messageUser.participants.map(part => {
-      if(part.toString() !== talk.caller.toString()) {
+  Talk.findOne({ _id: data.talk._id }).populate('messageUser').then((talk) => {
+    const surveys = talk.messageUser.participants.map((part) => {
+      if (part.toString() !== talk.caller.toString()) {
         return { respondent: part };
       }
     });
@@ -53,7 +53,7 @@ exports.userSurveys = (io, socket, data) => {
 };
 
 exports.updateText = (io, socket, data) => {
-  Talk.findByIdAndUpdate(data.talk._id, { $set: { 'blackboard.text': data.blackboardText } }).catch(err => {console.log(err)});
+  Talk.findByIdAndUpdate(data.talk._id, { $set: { 'blackboard.text': data.blackboardText } }).catch((err) => { console.log(err); });
 };
 
 exports.finishSurvey = (io, socket, data) => {
@@ -63,7 +63,7 @@ exports.finishSurvey = (io, socket, data) => {
 };
 
 exports.abortCall = (io, socket, data) => {
-  io.to(`talk_${data.messageUser}`).emit('abort_call');
+  io.to(`talk_${data.messageUser}`).emit('abort_call', { _id: socket.authUser._id });
   socket.leave(`talk_${data.messageUser}`);
 };
 
@@ -71,19 +71,19 @@ exports.handleIncomingCall = (io, socket, data) => {
   socket.join(`talk_${data.messageUser}`);
   // socket.to(`talk_${data.messageUser}`).emit('respond_to_call');
 };
-exports.createPeer = (io, socket, data = { peer: null, messageUser: null }) => {
-  socket.to(`talk_${data.messageUser}`).emit('peer_connection', { peer: data.peer });
+exports.createPeer = (io, socket, data = { peer: null, messageUser: null, _id: '' }) => {
+  socket.to(`talk_${data.messageUser}`).emit('peer_connection', { peer: data.peer, auth: socket.authUser._id, _id });
 };
-exports.createPeerConnection = (io, socket, data = { peer: null, messageUser: null }) => {
-  socket.to(`talk_${data.messageUser}`).emit('create_peer_connection', { peer: data.peer });
+exports.createPeerConnection = (io, socket, data = { peer: null, messageUser: null, _id: '' }) => {
+  socket.to(`talk_${data.messageUser}`).emit('create_peer_connection', { peer: data.peer, auth: socket.authUser._id, _id });
 };
 
 exports.answerCall = (io, socket, data) => {
-  io.in(`talk_${data.messageUser}`).emit('answer_call', { name: socket.authUser.name });
+  io.in(`talk_${data.messageUser}`).emit('answer_call', { name: socket.authUser.name, _id: socket.authUser._id });
 };
 
 exports.receiverStream = (io, socket, data) => {
-  socket.to(`talk_${data.messageUser}`).emit('got_receiver_stream');
+  socket.to(`talk_${data.messageUser}`).emit('got_receiver_stream', { _id: socket.authUser._id });
 };
 
 exports.getToken = (io, socket, data) => {

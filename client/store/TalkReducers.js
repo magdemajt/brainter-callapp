@@ -4,6 +4,7 @@ import _ from 'lodash';
 // Initial State
 const initialState = {
   talk: {},
+  participants: [],
   localStream: null,
   remoteStream: null,
   blackboardText: '',
@@ -44,11 +45,14 @@ const talkReducer = (oldState = initialState, action) => {
     case 'INIT_TEACHER_TALK': {
       return Object.assign({}, state, { talk: action.talk, seen: true, creator: action.creator });
     }
+    case 'INIT_PARTICIPANTS': {
+      return Object.assign({}, state, { participants: action.participants });
+    }
     case 'INIT_LOCAL_STREAM': {
-      return { ...state, localStream: JSON.stringify(action.localStream) };
+      return { ...state, localStream: (action.localStream) };
     }
     case 'INIT_REMOTE_STREAM': {
-      return { ...state, remoteStream: JSON.stringify(action.remoteStream) };
+      return { ...state, remoteStream: (action.remoteStream) };
     }
     case 'EDIT_BLACKBOARD': {
       return { ...state, blackboardText: action.blackboardText };

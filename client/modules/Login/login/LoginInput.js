@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { validateEmail, escapeRegExp } from '../../../components/validation';
 import { login } from '../../../axiosWrappers/login';
 import history from '../../../history';
+
 class LoginInput extends React.Component {
     state = {
         email: '',

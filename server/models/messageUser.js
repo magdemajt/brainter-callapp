@@ -48,7 +48,7 @@ messageUserSchema.statics.addMessage = function (messageUser, message, callback)
     .then(callback);
 };
 messageUserSchema.statics.createOrReturn = function (participants, requester, callback) {
-  return this.find({ participants }).populate('participants').sort('-updatedAt')
+  return this.find({ $and: [{ participants: { $all: participants } }, { participants: { $size: participants.length } }] }).populate('participants').sort('-updatedAt')
     .populate({
       path: 'messages',
       options: {
@@ -56,11 +56,14 @@ messageUserSchema.statics.createOrReturn = function (participants, requester, ca
         sort: '-createdAt'
       }
     })
+    .populate({ path: 'participants', select: 'name' })
     .then((mu) => {
       if (mu.length > 0) {
         callback(mu);
       } else {
-        this.create({ participants, requestingId: requester }).then(callback);
+        this.create({ participants, requestingId: requester }).then((messageUser) => {
+          this.find({ _id: messageUser._id }).populate({ path: 'participants', select: 'name' }).then(callback);
+        });
       }
     });
 };

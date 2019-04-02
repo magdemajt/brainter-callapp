@@ -11,7 +11,6 @@ import Tooltip from 'rc-tooltip';
 import mp3 from '../../sounds/calling.mp3';
 import { Link, withRouter } from 'react-router-dom';
 import { axiosPost } from '../../axiosWrappers';
-import CallWindow from '../CallWindow';
 // Import Style
 
 
@@ -25,6 +24,7 @@ class NavMenu extends React.Component {
     this.state = {
       clear: false,
     };
+    this.answeredCount = 0;
     this.hasListeners = false;
     this.timeout = null;
   }
@@ -50,21 +50,45 @@ class NavMenu extends React.Component {
     this.props.socket.on('created_talk', (data) => {
       const talk = data.talk;
       talk.tags = data.tags;
+      talk.participants = data.participants;
+      this.answeredCount = 0;
       this.props.initCurrentTalk(talk, true);
     });
-    this.props.socket.on('abort_call', () => {
-      this.props.clearCurrentTalk();
-      clearInterval(this.timeout);
-      this.timeout = null;
-      this.editClear(true);
+
+
+
+    this.props.socket.on('abort_call', (data) => {
+      if (this.props.talk.caller === this.props.user._id) {
+        this.answeredCount++;
+      }
+      if ((this.props.talk.caller === this.props.user._id && this.answeredCount === this.props.talk.participants - 1)
+      || (this.props.talk.caller === this.props.user._id && this.props.talk.caller === data._id)) {
+        this.props.clearCurrentTalk();
+        clearInterval(this.timeout);
+        this.timeout = null;
+        this.editClear(true);
+      }
     });
-    this.props.socket.on('answer_call', () => {
-      this.props.toggleSeen();
-      this.props.startCalling(null);
-      this.editClear(true);
-      clearInterval(this.timeout);
-      this.timeout = null;
-      history.push('/talk');
+    this.props.socket.on('answer_call', (data) => {
+      if (this.props.talk.caller === this.props.user._id) {
+        this.answeredCount++;
+      }
+      const participants = this.props.participants.concat({name: data.name, _id: data._id});
+        this.props.initParticipants(participants);
+        if (participants.length === 1) {
+          this.props.toggleSeen();
+          this.props.startCalling(null);
+          this.editClear(true);
+          clearInterval(this.timeout);
+          this.timeout = null;
+        }
+        if (location.pathname !== '/talk' && location.pathname !== '/multitalk') {
+          if (this.props.talk.participants.length > 2) {
+            history.push('/multitalk');
+          } else {
+            history.push('/talk');
+          } //participants
+        }
     });
     this.props.socket.on('message_user_new', (data) => {
       this.props.addMessageUser(data.messageUser);
@@ -85,6 +109,7 @@ class NavMenu extends React.Component {
     this.props.socket.on('incoming_call', (data) => {
       const talk = data.talk;
       talk.tags = data.tags;
+      talk.participants = data.participants;
       if (!this.props.talk.hasOwnProperty('_id')) {
         this.props.socket.emit('incoming_call', { messageUser: talk.messageUser });
         this.props.initCurrentTalk(talk, false);
@@ -179,9 +204,6 @@ class NavMenu extends React.Component {
                 </Link>
               </div>
           </nav>
-          {this.props.socket !== null && this.props.talk.hasOwnProperty('_id') && this.props.seen && this.props.talkMu === null ? (
-            <CallWindow />
-          ): null}
           <IncomingCallModal opened={!this.props.seen && this.props.talk.hasOwnProperty('_id')} />
           <CallingModal clearState={this.state.clear} editClear={this.editClear} opened={this.props.talkMu !== null} messageUser={this.props.talkMu} />
         </React.Fragment>
@@ -207,6 +229,7 @@ const mapStateToProps = state => ({
   socket: state.io.socket,
   seen: state.talk.seen,
   talk: state.talk.talk,
+  participants: state.talk.participants,
   talkMu: state.talk.messageUser,
   p2p: state.io.p2p,
   messageUsers: state.messages.messageUsers,
@@ -281,6 +304,10 @@ const mapDispatchToProps = (dispatch) => {
     userActive: (user) => dispatch({
       type: 'USER_ACTIVE',
       user
+    }),
+    initParticipants: (participants) => dispatch({
+      type: 'INIT_PARTICIPANTS',
+      participants
     })
   };
 };
