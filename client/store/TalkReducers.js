@@ -6,20 +6,26 @@ const initialState = {
   talk: {},
   participants: [],
   localStream: null,
-  remoteStream: null,
+  remoteStream: [],
   blackboardText: '',
-  seen: false,
   messageUser: null,
   creator: false,
   tagModal: false,
-  teacherTalks: []
+  teacherTalks: [],
+  peers: []
 };
 
 const talkReducer = (oldState = initialState, action) => {
   const state = Object.assign({}, oldState);
   switch (action.type) {
+    case 'ADD_PEER': {
+      return { ...state, peers: state.peers.concat(action.peer) };
+    }
+    case 'REMOVE_PEER': {
+      return { ...state, peers: state.peers.filter(peer => action.peer.user !== peer.user) };
+    }
     case 'INIT_TALK': {
-      return Object.assign({}, state, { talk: action.talk, seen: action.seen, creator: action.seen });
+      return Object.assign({}, state, { talk: action.talk, creator: action.seen });
     }
     case 'CLEAR_TALK': {
       return initialState;
@@ -43,7 +49,7 @@ const talkReducer = (oldState = initialState, action) => {
       return Object.assign({}, state, { teacherTalks: _.without(state.teacherTalks, action.teacherTalk) });
     }
     case 'INIT_TEACHER_TALK': {
-      return Object.assign({}, state, { talk: action.talk, seen: true, creator: action.creator });
+      return Object.assign({}, state, { talk: action.talk, creator: action.creator });
     }
     case 'INIT_PARTICIPANTS': {
       return Object.assign({}, state, { participants: action.participants });

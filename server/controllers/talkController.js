@@ -78,6 +78,18 @@ exports.createPeerConnection = (io, socket, data = { peer: null, messageUser: nu
   socket.to(`talk_${data.messageUser}`).emit('create_peer_connection', { peer: data.peer, auth: socket.authUser._id, _id });
 };
 
+exports.sendPeer = (io, socket, data) => {
+  socket.to(`room_${data.user}`).emit('received_peer', { user: socket.authUser._id, peer: data.peer });
+};
+
+exports.sendActionList = (io, socket, data) => {
+  socket.to(`talk_${data.messageUser}`).emit('action_list', { actionList: data.actionList });
+};
+
+exports.getActionList = (io, socket, data) => {
+  socket.to(`talk_${data.messageUser}`).emit('get_action_list');
+};
+
 exports.answerCall = (io, socket, data) => {
   io.in(`talk_${data.messageUser}`).emit('answer_call', { name: socket.authUser.name, _id: socket.authUser._id });
 };

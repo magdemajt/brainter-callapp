@@ -18,11 +18,12 @@ const io = require('socket.io')(http);
 require('./server/routes/socketio')(io);
 // mongoose.connect('mongodb://admin:admin@localhost:27017/Brainter');
 const transporter = nodeMailer.createTransport('smtps://no-reply@brainter.study:F1UZgi8nU2LOHnyDXcRE@poczta.mydevil.net/?pool=true');
-//Hasło do maila no-reply@brainter.study - F1UZgi8nU2LOHnyDXcRE
+// Hasło do maila no-reply@brainter.study - F1UZgi8nU2LOHnyDXcRE
 
 // for build
 mongoose.connect('mongodb://mo1292_brainters:yHcRxwQRcYWFrVmrQDG2@mongo22.mydevil.net/mo1292_brainters');
-
+// for development
+// mongoose.connect('mongodb://mo1292_brainterd:T561x4fzFwsJMIOzq13g@mongo22.mydevil.net/mo1292_brainterd');
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));

@@ -23,6 +23,7 @@ class NavMenu extends React.Component {
     super(props);
     this.state = {
       clear: false,
+      talkModal: false,
     };
     this.answeredCount = 0;
     this.hasListeners = false;
@@ -30,6 +31,9 @@ class NavMenu extends React.Component {
   }
   editClear = (clear) => {
     this.setState({clear});
+  }
+  editTalkModal = (talkModal) => {
+    this.setState({talkModal});
   }
 
   clearTalk = () => {
@@ -53,42 +57,31 @@ class NavMenu extends React.Component {
       talk.participants = data.participants;
       this.answeredCount = 0;
       this.props.initCurrentTalk(talk, true);
+      history.push('/talk');
     });
 
-
-
-    this.props.socket.on('abort_call', (data) => {
-      if (this.props.talk.caller === this.props.user._id) {
-        this.answeredCount++;
-      }
-      if ((this.props.talk.caller === this.props.user._id && this.answeredCount === this.props.talk.participants - 1)
-      || (this.props.talk.caller === this.props.user._id && this.props.talk.caller === data._id)) {
-        this.props.clearCurrentTalk();
-        clearInterval(this.timeout);
-        this.timeout = null;
-        this.editClear(true);
-      }
+    this.props.socket.on('received_peer', (data) => {
+      this.props.addPeer({ user: data.user, peer: data.peer });
     });
+
+    // this.props.socket.on('abort_call', (data) => {
+    //   if (this.props.talk.caller === this.props.user._id) {
+    //     this.answeredCount++;
+    //   }
+    //   if ((this.props.talk.caller === this.props.user._id && this.answeredCount === this.props.talk.participants - 1)
+    //   || (this.props.talk.caller === this.props.user._id && this.props.talk.caller === data._id)) {
+    //     this.props.clearCurrentTalk();
+    //     clearInterval(this.timeout);
+    //     this.timeout = null;
+    //     this.editClear(true);
+    //   }
+    // });
     this.props.socket.on('answer_call', (data) => {
-      if (this.props.talk.caller === this.props.user._id) {
-        this.answeredCount++;
-      }
-      const participants = this.props.participants.concat({name: data.name, _id: data._id});
-        this.props.initParticipants(participants);
-        if (participants.length === 1) {
-          this.props.toggleSeen();
-          this.props.startCalling(null);
-          this.editClear(true);
-          clearInterval(this.timeout);
-          this.timeout = null;
-        }
-        if (location.pathname !== '/talk' && location.pathname !== '/multitalk') {
-          if (this.props.talk.participants.length > 2) {
-            history.push('/multitalk');
-          } else {
-            history.push('/talk');
-          } //participants
-        }
+      this.editTalkModal(false);
+      this.props.startCalling(null);
+      this.editClear(true);
+      clearInterval(this.timeout);
+      history.push('/talk');
     });
     this.props.socket.on('message_user_new', (data) => {
       this.props.addMessageUser(data.messageUser);
@@ -113,17 +106,17 @@ class NavMenu extends React.Component {
       if (!this.props.talk.hasOwnProperty('_id')) {
         this.props.socket.emit('incoming_call', { messageUser: talk.messageUser });
         this.props.initCurrentTalk(talk, false);
+        this.editTalkModal(true);
         try {
           let audio = new Audio(mp3);
           let count = 0;
           let timeout = setInterval(() => {
             if(count === 6) {
               clearInterval(timeout);
-              this.props.socket.emit('abort_call_client', { messageUser: talk.messageUser })
             }
             audio.play();
             count++;
-          }, 7000);
+          }, 4000);
           this.timeout = timeout;
         }
         catch (err) {
@@ -204,7 +197,7 @@ class NavMenu extends React.Component {
                 </Link>
               </div>
           </nav>
-          <IncomingCallModal opened={!this.props.seen && this.props.talk.hasOwnProperty('_id')} />
+          <IncomingCallModal opened={this.props.talk.hasOwnProperty('_id') && this.state.talkModal} editTalkModal={this.editTalkModal} />
           <CallingModal clearState={this.state.clear} editClear={this.editClear} opened={this.props.talkMu !== null} messageUser={this.props.talkMu} />
         </React.Fragment>
       );
@@ -308,6 +301,14 @@ const mapDispatchToProps = (dispatch) => {
     initParticipants: (participants) => dispatch({
       type: 'INIT_PARTICIPANTS',
       participants
+    }),
+    addPeer: (peer) => dispatch({
+      type: 'ADD_PEER',
+      peer
+    }),
+    removePeer: (peer) => dispatch({
+      type: 'REMOVE_PEER',
+      peer
     })
   };
 };

@@ -2,6 +2,7 @@ import _ from 'lodash';
 // Initial State
 const initialState = {
   messageUsers: [],
+  manualScroll: false,
   user: {
     participants: []
   }
@@ -18,6 +19,9 @@ const messageReducers = (oldState = initialState, action) => {
         messageUsers.push(newMu);
       });
       return Object.assign({}, state, { messageUsers });
+    }
+    case 'SET_MANUAL_SCROLL': {
+      return { ...state, manualScroll: action.manualScroll };
     }
     case 'ADD_MESSAGE': {
       const index = state.messageUsers.indexOf(state.messageUsers.find(mu => mu._id === action.user));
