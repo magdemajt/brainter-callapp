@@ -1,21 +1,22 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import Blackboard from './components/Blackboard';
-import Connector from './components/Connector';
-import history from '../../history';
 
-const Talk = ({ talk }) => {
-  if (!talk.hasOwnProperty('_id')) {
-    history.push('/');
-  } else {
-    return (
-      <Connector />
-    );
-  }
-  return null;
+const Connector = ({
+  user, authUser, socket, messageUsers, p2p, talk, creator, localStream, remoteStream, blackboardText, initLocal, initUser, initP2P, initRemote, clearTalk, editBlackboard
+}) => {
+  const p2ps = [];
+  const queuedPeers = [];
+
+  useEffect(() => {
+    const d = [];
+    return () => {
+      socket.removeListener('create_peer_connection');
+      socket.removeListener('peer_connection');
+      socket.removeListener('got_token');
+    };
+  }, [socket]);
 };
 
-// Retrieve data from store as props
 const mapStateToProps = state => ({
   user: state.search.user,
   authUser: state.userData.user,
@@ -23,7 +24,7 @@ const mapStateToProps = state => ({
   messageUsers: state.messages.messageUsers,
   p2p: state.io.p2p,
   talk: state.talk.talk,
-  creator: state.talk.creator,
+  creator: state.talk.talk.caller === state.userData.user._id,
   localStream: (state.talk.localStream),
   remoteStream: (state.talk.remoteStream),
   blackboardText: state.talk.blackboardText
@@ -56,6 +57,5 @@ const mapDispatchToProps = (dispatch) => {
     })
   };
 };
-/* eslint-enable */
 
-export default connect(mapStateToProps, mapDispatchToProps)(Talk);
+export default connect(mapStateToProps, mapDispatchToProps)(Connector);

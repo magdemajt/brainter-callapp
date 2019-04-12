@@ -6,11 +6,14 @@ const {
   answerCall,
   createPeerConnection,
   createPeer,
+  sendPeer,
   receiverStream,
   getToken,
   finishCall,
   userSurveys,
-  finishSurvey
+  finishSurvey,
+  sendActionList,
+  getActionList
 } = require('../controllers/talkController');
 const {
   searchTeacher,
@@ -67,6 +70,9 @@ module.exports = (io) => {
     socket.on('incoming_call', data => handleIncomingCall(io, socket, data));
     socket.on('create_peer_connection', data => createPeerConnection(io, socket, data));
     socket.on('peer_connection', data => createPeer(io, socket, data));
+    socket.on('send_peer', data => sendPeer(io, socket, data));
+    socket.on('send_action_list', data => sendActionList(io, socket, data));
+    socket.on('get_action_list', data => getActionList(io, socket, data));
     socket.on('receiver_stream', data => receiverStream(io, socket, data));
     socket.on('create_message', data => createNewMessage(io, socket, data));
     socket.on('seen_messages', data => seenMessages(io, socket, data));

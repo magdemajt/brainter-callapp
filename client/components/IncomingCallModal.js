@@ -25,7 +25,7 @@ const IncomingCallModal = (props) => {
   );
   const modalCancel = (
     <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.reject')} >
-      <button id="modalRejectButton" onClick={() => {props.socket.emit('abort_call_client', { messageUser: props.talk.messageUser }) }}>
+      <button id="modalRejectButton" onClick={() => {props.editTalkModal(false)}}>
         <i className="border" />
       </button>
     </Tooltip>
