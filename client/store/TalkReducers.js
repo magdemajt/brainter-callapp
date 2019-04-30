@@ -21,6 +21,13 @@ const talkReducer = (oldState = initialState, action) => {
     case 'ADD_PEER': {
       return { ...state, peers: state.peers.concat(action.peer) };
     }
+    case 'CLEAR_PEERS': {
+      const newPeers = state.peers;
+      action.peers.forEach((peer) => {
+        _.remove(newPeers, peer);
+      });
+      return { ...state, peers: newPeers };
+    }
     case 'REMOVE_PEER': {
       return { ...state, peers: state.peers.filter(peer => action.peer.user !== peer.user) };
     }

@@ -4,6 +4,7 @@
   width: 25vw;
   &.right {
     float: right;
+    justify-self: flex-end;
   }
   &.flex {
     display: flex;

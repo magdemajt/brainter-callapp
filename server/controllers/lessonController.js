@@ -38,6 +38,10 @@ exports.searchTeacher = (io, socket, {
   }
 };
 
+exports.saveTimetable = (io, socket, data) => {
+  User.update({ _id: socket.authUser._id }, { $set: { timetable: data.timetable } }).catch((err) => {});
+};
+
 exports.searchTeacherMulti = (io, socket, {
   topic, selectedTags, paid, multiperson
 }) => {
@@ -51,14 +55,14 @@ exports.searchTeacherMulti = (io, socket, {
     .catch(err => console.log(err));
 };
 
-exports.leaveMultiRoom = (io, socket, {talk}) => {
-  socket.emit('multi_joined_user', {talk});
-  io.to(`multi_${talk._id}`).broadcast.emit('multi_left', { user: { _id: socket.authUser._id} });
+exports.leaveMultiRoom = (io, socket, { talk }) => {
+  socket.emit('multi_joined_user', { talk });
+  io.to(`multi_${talk._id}`).broadcast.emit('multi_left', { user: { _id: socket.authUser._id } });
   socket.join(`multi_${talk._id}`);
 };
 
-exports.joinMultiRoom = (io, socket, {talk}) => {
-  socket.emit('multi_joined_user', {talk});
+exports.joinMultiRoom = (io, socket, { talk }) => {
+  socket.emit('multi_joined_user', { talk });
   io.to(`multi_${talk._id}`).broadcast.emit('multi_joined', { user: { _id: socket.authUser._id, name: socket.authUser.name } });
   socket.join(`multi_${talk._id}`);
 };

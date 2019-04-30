@@ -12,6 +12,9 @@
   padding: .5rem;
   display: flex;
   flex-direction: column;
+  &.small {
+    height: 50%;
+  }
   li {
     max-width: 100%;
     padding: .5rem 1.5rem;

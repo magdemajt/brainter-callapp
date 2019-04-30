@@ -1,0 +1,9 @@
+.timetable-item {
+  padding: .5rem;
+  margin: .2rem;
+  background: $color-blue;
+  cursor: pointer;
+  &.active {
+    background: $color-secondary;
+  }
+}

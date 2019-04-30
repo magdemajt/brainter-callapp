@@ -13,7 +13,8 @@ const {
   userSurveys,
   finishSurvey,
   sendActionList,
-  getActionList
+  getActionList,
+  leaveTalk
 } = require('../controllers/talkController');
 const {
   searchTeacher,
@@ -25,7 +26,8 @@ const {
   destroyMultiTalk,
   joinMultiRoom,
   startMultiTalk,
-  createMultiTalk
+  createMultiTalk,
+  saveTimetable
 } = require('../controllers/lessonController');
 const {
   createNewMessage,
@@ -74,12 +76,14 @@ module.exports = (io) => {
     socket.on('send_action_list', data => sendActionList(io, socket, data));
     socket.on('get_action_list', data => getActionList(io, socket, data));
     socket.on('receiver_stream', data => receiverStream(io, socket, data));
+    socket.on('leave_talk', data => leaveTalk(io, socket, data));
     socket.on('create_message', data => createNewMessage(io, socket, data));
     socket.on('seen_messages', data => seenMessages(io, socket, data));
     socket.on('get_message_users', data => getMessageUsers(io, socket, data));
     socket.on('get_messages', data => getMessages(io, socket, data));
     socket.on('begin_chat', data => beginChat(io, socket, data));
     socket.on('find_users', data => findUsers(io, socket, data));
+    socket.on('save_timetable', data => saveTimetable(io, socket, data));
     socket.on('disconnect', data => userNotActive(io, socket, data));
   });
 };

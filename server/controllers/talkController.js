@@ -18,11 +18,19 @@ exports.createNewCall = (io, socket, data) => {
     caller: data.caller
   });
   talk.save();
-  MessageUser.findById(data.messageUser).then((mUser) => {
-    socket.emit('created_talk', { talk, participants: mUser.participants });
+  MessageUser.findById(data.messageUser).populate({
+    path: 'messages',
+    options: {
+      limit: 25,
+      sort: '+createdAt',
+    }
+  }).then((mUser) => {
+    socket.emit('created_talk', { talk, participants: mUser.participants, messages: mUser.messages });
     mUser.participants.forEach((part) => {
       if (part.toString() !== socket.authUser._id.toString()) {
-        io.to(`room_${part}`).emit('incoming_call', { talk, tags: data.tags, participants: mUser.participants });
+        io.to(`room_${part}`).emit('incoming_call', {
+          talk, tags: data.tags, participants: mUser.participants, messages: mUser.messages
+        });
       }
     });
   }).catch((err) => {
@@ -64,6 +72,10 @@ exports.finishSurvey = (io, socket, data) => {
 
 exports.abortCall = (io, socket, data) => {
   io.to(`talk_${data.messageUser}`).emit('abort_call', { _id: socket.authUser._id });
+  socket.leave(`talk_${data.messageUser}`);
+};
+
+exports.leaveTalk = (io, socket, data) => {
   socket.leave(`talk_${data.messageUser}`);
 };
 

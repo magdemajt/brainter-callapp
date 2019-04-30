@@ -27,28 +27,16 @@ class Messages extends Component {
     this.listRef = React.createRef();
     this.updatingMessageUsers = false;
     this.checkedURL = false;
+    this.previousId = '';
   }
   openMessagesIfRouteUser () {
     return this.props.messageUsers.find(mu => {
-      if (mu.participants.length == 2) {
-        let foundAuth = false;
-        let foundUser = false;
-        mu.participants.forEach(par => {
-          if (par._id === this.props.authUser._id) {
-            foundAuth = true;
-          }
-          if (par._id === this.props.match.params.id) {
-            foundUser = true;
-          }
-        });
-        return foundAuth && foundUser;
-      }
-      return false;
+      return (mu._id === this.props.match.params.id) || (mu.participants.find(par => par._id === this.props.match.params.id) !== undefined && mu.participants.find(par => par._id === this.props.authUser._id) !== undefined && mu.participants.length === 2);
     });
   }
   checkURL () {
-    if (!this.checkedURL && this.props.messageUsers.length > 0 && this.props.match.params.id !== '0') {
-      console.log('Coś się dzieje')
+    if (this.previousId !== this.props.match.params.id && this.props.messageUsers.length > 0 && this.props.match.params.id !== '0') {
+      console.log(this.previousId)
       const chosenUser = this.openMessagesIfRouteUser();
       if (this.props.match.params.talking === 'true') {
         console.log(chosenUser)
@@ -56,7 +44,7 @@ class Messages extends Component {
       } else {
         this.onSelect(chosenUser);
       }
-      this.checkedURL = true;
+      this.previousId = this.props.match.params.id;
     }
   }
   componentDidMount () {

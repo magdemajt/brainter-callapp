@@ -1,7 +1,9 @@
 import React, { Component, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import Peer from 'simple-peer';
 import VideoPlayer from './VideoPlayer';
 import history from '../../../history';
+import Blackboard from './Blackboard';
 // Import Style
 
 // Lista osób do stworzenia peerów w reducerze i event globalny dodawania peerów, obsługa eventów peerów, sprawdzenie czy został uzyskany token
@@ -9,12 +11,14 @@ import history from '../../../history';
 // W addToPeerList event stworzenie akcji 'ADD' rozesłanie tej action storage do wszystkich
 
 const Connector = ({
-  users, creator, socket, authUser, peers, talk, clearTalk, children, initRemote, initLocal, remoteStream, editBlackboard, locallyStream
+  users, creator, socket, authUser, peers, clearPeers, talk, locallyStream, initLocal, clearTalk, children, editBlackboard, blackboardText
 }) => {
   let actionList = []; // action: { type: '', user: '' }
-  const connectedPeerList = []; // peer: { p2p, peer: null, user }
+  const [connectedPeerList, setConnectedPeerList] = useState([]); // peer: { p2p, user }
   const [clearing, setClearing] = useState(false);
-  let ices;
+  const [ices, setIces] = useState(null);
+  const [remoteStreams, initRemote] = useState([]);
+  let participants = [];
 
   function sendActionList() {
     socket.emit('send_action_list', { actionList, messageUser: talk.messageUser });
@@ -28,19 +32,21 @@ const Connector = ({
     actionList.push({ type: 'ADD', user });
     sendActionList();
   }
+  function sendToPeers(data, doSomethingElse = () => {}) {
+    try {
+      connectedPeerList.forEach((peer) => {
+        peer.p2p.send(JSON.stringify(data));
+        doSomethingElse(peer);
+      });
+    } catch (e) {
+
+    }
+  }
 
   // function removeFromPeerList(user) {
 
   // }
 
-  function disconnect() {
-    connectedPeerList.forEach((peer) => {
-      peer.p2p.destroy();
-    });
-    actionList.push({ type: 'REMOVE', user: authUser._id });
-    sendActionList();
-    clearCall();
-  }
 
   function getUserStream() {
     if (creator || users === 1) {
@@ -53,41 +59,70 @@ const Connector = ({
       try {
         return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       } catch (e) {
-
+        console.log(e);
+        return null;
       }
     }
   }
 
   function clearCall() {
-    locallyStream.getTracks().forEach(track => track.stop());
+    try {
+      locallyStream.getTracks().forEach(track => track.stop());
+    } catch (e) {
+      console.log(locallyStream);
+    }
     clearTalk();
     history.push('/');
   }
 
-  function setListeners(p2p, user) {
+  function disconnect() {
+    sendToPeers({ type: 'END_CALL' }, (peer) => {
+      peer.p2p.destroy();
+    });
+    socket.emit('leave_talk', { messageUser: talk.messageUser });
+    actionList.push({ type: 'REMOVE', user: authUser._id });
+    sendActionList();
+    clearCall();
+  }
+
+
+  const setListeners = (p2p, user) => {
+    console.log('setting!');
     p2p.on('signal', (data) => {
       socket.emit('send_peer', { user, peer: data });
     });
-    p2p.on('stream', (stream) => {
-      initRemote([...remoteStream, { stream, user }]);
+    p2p.on('stream', (s) => {
+      const stream = new MediaStream(s);
+      initRemote([...remoteStreams, { stream, user }]);
     });
     p2p.on('data', (sendData) => {
       const data = JSON.parse(sendData);
+      console.log(data);
+      console.log(remoteStreams);
       switch (data.type) {
-        case 'MUTE_REMOTE':
-          remoteStream.find(s => s.user === user).stream.getAudioTracks()[0].enabled = false;
-          break;
-        case 'UNMUTE_REMOTE':
-          remoteStream.find(s => s.user === user).stream.getAudioTracks()[0].enabled = true;
-          break;
-        case 'MUTE_VIDEO':
-          remoteStream.find(s => s.user === user).stream.getVideoTracks()[0].enabled = false;
-          break;
-        case 'UNMUTE_VIDEO':
-          remoteStream.find(s => s.user === user).stream.getVideoTracks()[0].enabled = true;
-          break;
+        // case 'MUTE_REMOTE':
+        //   p2p.streams[0].getAudioTracks()[0].enabled = false;
+        //   remoteStreams.find(s => s.user === user).stream.getAudioTracks()[0].enabled = false;
+        //   break;
+        // case 'UNMUTE_REMOTE':
+        //   remoteStreams.find(s => s.user === user).stream.getAudioTracks()[0].enabled = true;
+        //   break;
+        // case 'MUTE_VIDEO':
+        //   console.log(p2p.streams[0].getVideoTracks());
+        //   p2p.streams[0].getVideoTracks()[0].enabled = false;
+        //   remoteStreams.find(s => s.user === user).stream.getVideoTracks()[0].enabled = false;
+        //   break;
+        // case 'UNMUTE_VIDEO':
+        //   p2p.streams[0].getVideoTracks()[0].enabled = false;
+        //   remoteStreams.find(s => s.user === user).stream.getVideoTracks()[0].enabled = true;
+        //   break;
         case 'END_CALL':
-          clearCall(peerObject);
+          console.log('wirke');
+          if (participants.length === 2) {
+            clearCall();
+            socket.emit('finish_call_client', { talk });
+            socket.emit('change_blackboard', { talk, blackboardText });
+          }
           break;
         case 'BLACKBOARD_TEXT':
           editBlackboard(data.blackboardText);
@@ -95,30 +130,32 @@ const Connector = ({
       }
       console.log(data);
     });
+    // p2p.on('track', (track, stream) => {
+    //   console.log(track, stream);
+    // });
     p2p.on('error', (err) => {
       console.log('WebRTC bład', err);
-      clearCall();
+      if (clearing) {
+        clearCall();
+      }
     });
-  }
+  };
 
   function connectPeer() {
-    peers.filter((peer) => {
-      const found = connectedPeerList.find(p => p.user === peer.user);
-      return found !== undefined && found.peer === null;
-    }).forEach((peer) => {
-      const found = connectedPeerList.find(p => p.user === peer.user);
-      found.peer = peer.peer;
-      found.p2p.signal(peer.peer);
+    const toDelete = [];
+    peers.forEach((peer) => {
+      const found = connectedPeerList.find(p => p.user === peer.user); // Usuwać je
+      if (found !== undefined) {
+        found.p2p.signal(peer.peer);
+        toDelete.push(peer);
+      }
     });
+    if (toDelete.length > 0) { clearPeers(toDelete); }
   }
 
   function initializeSockets() {
     getUserStream().then((localStream) => {
-      socket.on('got_token', (data) => {
-        ices = data.ices;
-      });
-      socket.emit('get_token');
-      initLocal(localStream);
+      initLocal(new MediaStream(localStream));
 
       socket.on('get_action_list', () => {
         sendActionList();
@@ -147,7 +184,10 @@ const Connector = ({
             newActions.push(item);
           }
         }
-        actionList = newActions;
+        if (newActions.length > actionList.length) {
+          actionList = newActions;
+          sendActionList();
+        }
 
         let newPeers = [];
 
@@ -161,25 +201,27 @@ const Connector = ({
         });
 
         const addYou = connectedPeerList.length === 0;
-
-        newPeers.filter(us => (connectedPeerList.find(cp => cp.user === us) !== undefined && us === authUser._id)).forEach((us) => {
+        const newCPL = connectedPeerList; // newConnectedPeerList
+        participants = (newPeers);
+        newPeers.filter(us => (connectedPeerList.find(cp => cp.user === us) === undefined && us !== authUser._id)).forEach((us) => {
           const p2p = new Peer({
-            initiator: us < authUser._id, stream: localStream, config: { iceServers: ices }, reconnectTimer: 3000
+            initiator: us < authUser._id, stream: localStream, config: { iceServers: ices }, reconnectTimer: 6000
           });
           setListeners(p2p, us);
-          if (us < authUser._id) {
-            // done
-          } else {
-            // Here just wait for connection to be created
-          }
-          connectedPeerList.push({ peer: null, p2p, user: us });
+          newCPL.push({ p2p, user: us });
         });
-        if (addYou) {
+        setConnectedPeerList(newCPL);
+        if (addYou && !creator) {
           addToPeerList(authUser._id);
         }
         connectPeer();
       });
     });
+  }
+
+  function changeBlackboard(e) {
+    editBlackboard(e.target.value);
+    sendToPeers({ blackboardText: e.target.value, type: 'BLACKBOARD_TEXT' });
   }
 
 
@@ -190,36 +232,60 @@ const Connector = ({
   }, [clearing]);
 
   useEffect(() => {
-    if (creator) {
-      addToPeerList(authUser._id);
-      setTimeout(() => {
-        if (connectedPeerList.length === 0) {
-          setClearing(true);
-        }
-      }, 5000);
+    if (connectedPeerList.length > 0) { connectPeer(); }
+  }, [peers, connectedPeerList]);
+
+  useEffect(() => {
+    socket.on('got_token', (data) => {
+      setIces(data.ices);
+    });
+    if (ices !== null) {
+      initializeSockets();
     } else {
-      getActionList();
+      socket.emit('get_token');
     }
-  }, []);
-
-  useEffect(() => {
-    connectPeer();
-  }, [peers]);
-
-  useEffect(() => {
-    initializeSockets();
     return () => {
       socket.removeListener('peer_list');
       socket.removeListener('got_token');
+      socket.removeListener('get_action_list');
+      socket.removeListener('action_list');
     };
-  }, [socket]);
+  }, [socket, ices]);
+
+  useEffect(() => {
+    if (ices !== null) {
+      if (creator) {
+        addToPeerList(authUser._id);
+        const inter = setInterval(() => {
+          if (connectedPeerList.length === 0) {
+            sendActionList();
+          } else {
+            clearInterval(inter);
+          }
+        }, 2000);
+        setTimeout(() => {
+          if (connectedPeerList.length === 0) {
+            setClearing(true);
+            clearInterval(inter);
+          }
+        }, 8000);
+      } else {
+        getActionList();
+      }
+    }
+  }, [ices]);
 
 
   return (
     <React.Fragment>
-      <VideoPlayer peers={connectedPeerList.map(peer => peer.p2p)} onEndCall={disconnect}>
+      <VideoPlayer
+        peers={connectedPeerList.map(peer => peer.p2p)}
+        onEndCall={disconnect}
+        remoteStreams={remoteStreams}
+      >
         {/* <TalkTools /> */}
       </VideoPlayer>
+      <Blackboard changeText={changeBlackboard} caller={creator} text={blackboardText} />
       {children}
     </React.Fragment>
   );
@@ -231,14 +297,12 @@ const mapStateToProps = state => ({
   authUser: state.userData.user,
   socket: state.io.socket,
   messageUsers: state.messages.messageUsers,
-  users: state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser) !== undefined ? state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser).length : 1,
-  p2p: state.io.p2p,
+  users: state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser) !== undefined ? state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser).participants.length - 1 : 1,
   talk: state.talk.talk,
   creator: state.talk.creator,
   locallyStream: (state.talk.localStream),
-  remoteStream: (state.talk.remoteStream),
   blackboardText: state.talk.blackboardText,
-  peers: state.talk.peers
+  peers: state.talk.peers,
 });
 /* eslint-disable */
 const mapDispatchToProps = (dispatch) => {
@@ -247,9 +311,9 @@ const mapDispatchToProps = (dispatch) => {
       type: 'INIT_SEARCH_USER',
       user,
     }),
-    initP2P: (opts) => dispatch({
-      type: 'INIT_P2P',
-      opts
+    clearPeers: (peers) => dispatch({
+      type: 'CLEAR_PEERS',
+      peers
     }),
     clearTalk: () => dispatch({
       type: 'CLEAR_TALK'
@@ -257,10 +321,6 @@ const mapDispatchToProps = (dispatch) => {
     initLocal: (localStream) => dispatch({
       type: 'INIT_LOCAL_STREAM',
       localStream
-    }),
-    initRemote: (remoteStream) => dispatch({
-      type: 'INIT_REMOTE_STREAM',
-      remoteStream
     }),
     editBlackboard: (blackboardText) => dispatch({
       type: 'EDIT_BLACKBOARD',

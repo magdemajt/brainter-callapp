@@ -17,6 +17,7 @@ import Talk from './modules/Talk';
 import Settings from './modules/Settings';
 import Admin from './modules/Admin';
 import Surveys from './modules/Surveys';
+import Lessons from './modules/Lessons';
 
 export default class App extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ export default class App extends Component {
           <PrivateRoute exact path="/users" component={Users} />
           <PrivateRoute path="/talk" component={Talk} />
           <PrivateRoute path="/settings" component={Settings} />
+          <PrivateRoute path="/lessons" component={Lessons} />
           <NoRegisterRoute path="/login" component={Login} />
           <NoRegisterRoute path="/register" component={Register} />
           <PrivateRoute path="/admin" component={Admin} />

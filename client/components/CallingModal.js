@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Modal from './Modal';
 import Tooltip from 'rc-tooltip';
 import { translate } from 'react-polyglot';
+import history from '../history';
 
 class CallingModal extends React.Component {
   constructor(props) {
@@ -20,6 +21,11 @@ class CallingModal extends React.Component {
   componentDidUpdate (prevProps, prevState, snapshot) {
     if (this.props.authUser !== undefined && this.props.authUser.tags !== undefined && this.props.authUser.tags.length > 0 && (prevProps.authUser === undefined || prevProps.authUser.tags === undefined || (prevProps.authUser.tags.length !== this.props.authUser.tags.length))) {
       this.setState({ tags: this.props.authUser.tags });
+    }
+    if(prevState.confirmed === false && this.state.confirmed) {
+      setTimeout(() => {
+        this.endCalling();
+      }, 8000);
     }
   }
 
@@ -82,6 +88,17 @@ class CallingModal extends React.Component {
     this.props.startCalling(null);
   }
 
+  abortCall = () => {
+    this.props.socket.emit('abort_call_client', { messageUser: this.props.messageUser });
+    this.endCalling();
+    try {
+      this.props.localStream.getTracks().forEach(track => track.stop());
+    } catch (e) {
+
+    }
+    history.push('/');
+  }
+
   getCaller = () => {
     try {
       const messageUser = this.props.messageUsers.find(mu => mu._id === this.props.messageUser);
@@ -111,7 +128,7 @@ class CallingModal extends React.Component {
     );
     const modalCancel = (
       <Tooltip placement="top" trigger={['hover']} overlay={props.t('talk.cancelCall')} >
-        <button id="modalRejectButton" onClick={() => { this.state.confirmed ? props.socket.emit('abort_call_client', { messageUser: props.messageUser }) : this.endCalling() }}>
+        <button id="modalRejectButton" onClick={() => { this.state.confirmed ? (this.abortCall()) : this.endCalling() }}>
           <i className="border" />
         </button>
       </Tooltip>
@@ -147,7 +164,8 @@ const mapStateToProps = state => ({
   talk: state.talk.talk,
   messageUsers: state.messages.messageUsers,
   messageUser: state.talk.messageUser,
-  authUser: state.userData.user
+  authUser: state.userData.user,
+  localStream: state.talk.localStream
 });
 const mapDispatchToProps = dispatch => {
   return {

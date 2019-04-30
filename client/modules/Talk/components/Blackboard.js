@@ -14,8 +14,9 @@ const Blackboard = ({
     {caller ? (
       <textarea value={text} onChange={changeText} className="blackboard-input" />) : (
         <h3 className="blackboard-text">
-            {text}
-          </h3>)}
+          {text}
+        </h3>
+    )}
   </div>
 );
 

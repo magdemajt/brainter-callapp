@@ -57,6 +57,7 @@ class NavMenu extends React.Component {
       talk.participants = data.participants;
       this.answeredCount = 0;
       this.props.initCurrentTalk(talk, true);
+      this.props.initMessageUser({ _id: talk.messageUser, messages: data.messages, participants: data.participants });
       history.push('/talk');
     });
 
@@ -64,24 +65,23 @@ class NavMenu extends React.Component {
       this.props.addPeer({ user: data.user, peer: data.peer });
     });
 
-    // this.props.socket.on('abort_call', (data) => {
-    //   if (this.props.talk.caller === this.props.user._id) {
-    //     this.answeredCount++;
-    //   }
-    //   if ((this.props.talk.caller === this.props.user._id && this.answeredCount === this.props.talk.participants - 1)
-    //   || (this.props.talk.caller === this.props.user._id && this.props.talk.caller === data._id)) {
-    //     this.props.clearCurrentTalk();
-    //     clearInterval(this.timeout);
-    //     this.timeout = null;
-    //     this.editClear(true);
-    //   }
-    // });
-    this.props.socket.on('answer_call', (data) => {
+    this.props.socket.on('abort_call', (data) => {
+      if (this.props.talk.caller === this.props.user._id) {
+        this.props.clearCurrentTalk();
+        this.editClear(true);
+      }
       this.editTalkModal(false);
-      this.props.startCalling(null);
-      this.editClear(true);
       clearInterval(this.timeout);
-      history.push('/talk');
+    });
+    this.props.socket.on('answer_call', (data) => {
+      if (this.props.talk.caller === this.props.user._id || this.props.user._id === data._id) {
+        console.log('executed')
+        this.editTalkModal(false);
+        clearInterval(this.timeout);
+        history.push('/talk');
+      }
+      this.editClear(true);
+      this.props.startCalling(null);
     });
     this.props.socket.on('message_user_new', (data) => {
       this.props.addMessageUser(data.messageUser);
@@ -106,6 +106,7 @@ class NavMenu extends React.Component {
       if (!this.props.talk.hasOwnProperty('_id')) {
         this.props.socket.emit('incoming_call', { messageUser: talk.messageUser });
         this.props.initCurrentTalk(talk, false);
+        this.props.initMessageUser({ _id: talk.messageUser, messages: data.messages, participants: data.participants });
         this.editTalkModal(true);
         try {
           let audio = new Audio(mp3);
@@ -134,6 +135,7 @@ class NavMenu extends React.Component {
         this.props.unshiftMessage(message, messageUser._id);
       });
     });
+
 
     this.hasListeners = true;
   }
@@ -188,6 +190,7 @@ class NavMenu extends React.Component {
               {this.props.talk.hasOwnProperty('_id') && this.props.seen && this.props.location.pathname !== '/talk' && this.props.talkMu === null ? (
                 <NavMenuItem location="/talk" locationName="Return to talk" />
               ) : null}
+              <NavMenuItem location="/lessons" locationName="Lessons" />
               <NavMenuItem location="/users" locationName="Users" />
               <NavMenuItem location="/messages/0/false" locationName="Messages" />
               <div className="nav-item">

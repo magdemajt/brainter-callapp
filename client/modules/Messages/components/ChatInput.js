@@ -5,7 +5,7 @@ import { translate } from 'react-polyglot';
 import Dropzone from 'react-dropzone';
 
 const ChatInput = ({
-  socket, authUser, user, setManualScroll, className, disabled, t, onDrop
+  socket, authUser, user, setManualScroll, className, disabled = false, t, onDrop
 }) => {
   const [messageText, setMessageText] = useState('');
   const [dragAndDrop, setDragAndDrop] = useState(false);

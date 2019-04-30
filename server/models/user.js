@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 const crypto = require('crypto');
 
 const userSchema = new Schema({
@@ -23,6 +23,8 @@ const userSchema = new Schema({
   birthDate: { type: 'Date' },
   salt: { type: 'String', select: false },
   talks: [{ type: Schema.Types.ObjectId, ref: 'Talk' }],
+  timetable: [],
+  lessons: [{ type: Schema.Types.ObjectId, ref: 'Lesson' }],
   createdAt: { type: 'Date', default: Date.now, required: true },
   actionStorage: { type: Schema.Types.ObjectId, ref: 'UserAction' }
 });

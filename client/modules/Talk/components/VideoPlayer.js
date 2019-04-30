@@ -8,26 +8,56 @@ import TalkTools from './TalkTools';
 
 // Import Components
 const VideoPlayer = ({
-  peers, remoteStreams, localStream, t, children, onEndCall
+  peers, remoteStreams, localStream, t, children, onEndCall, usersLength
 }) => {
   const localVideo = useRef(null);
   let remoteVideos = [];
   const [muted, setMuted] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [videoMuted, setVideoMuted] = useState(false);
+  const refs = [];
+  for (let i = 0; i < usersLength; i += 1) {
+    refs.push(useRef(null));
+  }
+
+  function muteLocal() {
+    peers.forEach((p2p) => {
+      p2p.streams[0].getAudioTracks()[0].enabled = !muted;
+    });
+  }
+  // function unmuteLocal() {
+  //   peers.forEach((p2p) => {
+  //     p2p.streams[0].getAudioTracks()[0].enabled = true;
+  //   });
+  // }
+
+  function muteLocalVideo() {
+    peers.forEach((p2p) => {
+      p2p.streams[0].getVideoTracks()[0].enabled = !videoMuted;
+    });
+  }
+
+  useEffect(() => {
+    muteLocal();
+  }, [muted, remoteStreams]);
+
+  useEffect(() => {
+    muteLocalVideo();
+  }, [videoMuted, remoteStreams]);
+
+  // function unmuteLocalVideo() {
+  //   peers.forEach((p2p) => {
+  //     p2p.streams[0].getVideoTracks()[0].enabled = true;
+  //   });
+  // }
 
   function setStreamForVideo(stream, videoElement) {
     try {
       videoElement.current.srcObject = stream;
     } catch (error) {
+      console.error(error);
       videoElement.src = stream !== null ? URL.createObjectURL(stream) : null;
     }
-  }
-
-  function sendMessageToPeers(message = '', payload = {}) {
-    peers.forEach((peer) => {
-      peer.send(JSON.stringify({ type: message, ...payload }));
-    });
   }
 
   function muteVideo(videoElement) {
@@ -35,20 +65,20 @@ const VideoPlayer = ({
   }
 
   function muteOrUnmuteRemote() {
-    if (!muted) {
-      sendMessageToPeers('MUTE_REMOTE');
-    } else {
-      sendMessageToPeers('UNMUTE_REMOTE');
-    }
+    // if (!muted) {
+    //   muteLocal();
+    // } else {
+    //   unmuteLocal();
+    // }
     setMuted(!muted);
   }
 
   function muteOrUnmuteVideo() {
-    if (videoMuted) {
-      sendMessageToPeers('MUTE_VIDEO');
-    } else {
-      sendMessageToPeers('UNMUTE_VIDEO');
-    }
+    // if (!videoMuted) {
+    //   muteLocalVideo();
+    // } else {
+    //   unmuteLocalVideo();
+    // }
     setVideoMuted(!videoMuted);
   }
 
@@ -57,10 +87,9 @@ const VideoPlayer = ({
   }, [localStream]);
 
   useEffect(() => {
-    remoteStreams.forEach((stream) => {
-      const videoRef = useRef();
-      setStreamForVideo(stream, videoRef);
-      remoteVideos.push(videoRef);
+    remoteStreams.forEach((stream, index) => {
+      console.log(stream);
+      setStreamForVideo(stream.stream, refs[index]);
     });
     return () => {
       remoteVideos = [];
@@ -70,10 +99,18 @@ const VideoPlayer = ({
   return (
     <div id="talkDiv">
       <video id="localVideo" ref={localVideo} autoPlay controls={false} muted />
-      {remoteVideos.map(video => (
+      {usersLength === 1
+        ? (
+          <video id="remoteVideo" ref={refs[0]} autoPlay controls={false} key={`nice${0}`} />
+        )
+        : ([...new Array(usersLength).keys()].map((num) => {
         // Size of this window should depend on number of connected users
-        <video id="remoteVideo" ref={video} autoPlay controls={false} />
-      ))}
+          if (num < remoteStreams.length) {
+            return (<audio id="remoteVideo" ref={refs[num]} autoPlay controls={false} key={`nice${num}`} />);
+          }
+          return null;
+        }))}
+      {}
       {children}
       <TalkTools onEndCall={onEndCall} onMute={muteOrUnmuteRemote} onVideoMute={muteOrUnmuteVideo} muted={muted} videoMuted={videoMuted} />
     </div>
@@ -149,8 +186,8 @@ const mapStateToProps = state => ({
   filter: state.search.filter,
   users: state.search.users,
   authUser: state.userData.user,
-  remoteStreams: state.talk.remoteStream,
   localStream: state.talk.localStream,
+  usersLength: state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser) !== undefined ? state.messages.messageUsers.find(mu => mu._id === state.talk.talk.messageUser).participants.length - 1 : 1,
 });
 /* eslint-disable */
 const mapDispatchToProps = (dispatch) => {
