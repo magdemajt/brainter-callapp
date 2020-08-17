@@ -1,20 +1,20 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-html {
-  font-size: 62.5%;
-  @media (min-width: $tablet-width) and (max-width: $desktop-width) {
-    font-size: 45%;
-  }  
-  @media (max-width: $tablet-width) {
-    font-size: 35%;
-  }  
-}
-input, textarea {
-  &::placeholder {
-    font-family: 'CooperHewittLight';
-    font-size: 1.4rem;
-  }
-}
+// * {
+//   margin: 0;
+//   padding: 0;
+//   box-sizing: border-box;
+// }
+// html {
+//   font-size: 62.5%;
+//   @media (min-width: $tablet-width) and (max-width: $desktop-width) {
+//     font-size: 45%;
+//   }  
+//   @media (max-width: $tablet-width) {
+//     font-size: 35%;
+//   }  
+// }
+// input, textarea {
+//   &::placeholder {
+//     font-family: 'CooperHewittLight';
+//     font-size: 1.4rem;
+//   }
+// }

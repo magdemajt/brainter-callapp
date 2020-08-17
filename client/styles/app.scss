@@ -1,50 +1,50 @@
-@import "./utils/variables";
-@import "./utils/mixins";
-@import "./base/reset";
-@import "./layout/footer";
-@import "./layout/forms";
-@import "./layout/grid";
-@import "./layout/header";
-@import "./layout/navigation";
-@import "./layout/sidebar";
-@import "./themes/theme";
-@import "./pages/login";
-@import "./components/button";
-@import "./components/input";
-@import "./components/message";
-@import "./components/modal";
-@import "./components/selection_list";
-@import "./components/badge";
-@import "./components/card";
-@import "./components/list";
-@import "./components/select";
-@import "./pages/profile";
-@import "./pages/search";
-@import "./pages/messages";
-@import "./pages/talk";
-@import "./pages/user";
-@import "./pages/timetable";
+// @import "./utils/variables";
+// @import "./utils/mixins";
+// @import "./base/reset";
+// @import "./layout/footer";
+// @import "./layout/forms";
+// @import "./layout/grid";
+// @import "./layout/header";
+// @import "./layout/navigation";
+// @import "./layout/sidebar";
+// @import "./themes/theme";
+// @import "./pages/login";
+// @import "./components/button";
+// @import "./components/input";
+// @import "./components/message";
+// @import "./components/modal";
+// @import "./components/selection_list";
+// @import "./components/badge";
+// @import "./components/card";
+// @import "./components/list";
+// @import "./components/select";
+// @import "./pages/profile";
+// @import "./pages/search";
+// @import "./pages/messages";
+// @import "./pages/talk";
+// @import "./pages/user";
+// @import "./pages/timetable";
 
-h1 {
-  color: green;
-}
+// h1 {
+//   color: green;
+// }
 
-body {
-  text-align: center;
-  margin: auto;
-}
+// body {
+//   text-align: center;
+//   margin: auto;
+// }
 
-#pageFooter {
-  position: absolute;
-  right: .5rem;
-  font-weight: 500;
-  font-size: 1.6rem;
-  bottom: .5rem;
-}
-input, textarea {
-  @include placeholder {
-    font-family: 'CooperHewittBook';
-    font-size: 1.6rem;
-    color: green;
-  }
-}
+// #pageFooter {
+//   position: fixed;
+//   right: .5rem;
+//   font-weight: 500;
+//   font-size: 1.6rem;
+//   bottom: .5rem;
+// }
+// input, textarea {
+//   @include placeholder {
+//     font-family: 'CooperHewittBook';
+//     font-size: 1.6rem;
+//     color: green;
+//   }
+// }

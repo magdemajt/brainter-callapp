@@ -21,9 +21,9 @@ const transporter = nodeMailer.createTransport('smtps://no-reply@brainter.study:
 // Hasło do maila no-reply@brainter.study - F1UZgi8nU2LOHnyDXcRE
 
 // for build
-mongoose.connect('mongodb://mo1292_brainters:yHcRxwQRcYWFrVmrQDG2@mongo22.mydevil.net/mo1292_brainters');
+// mongoose.connect('mongodb://mo1292_brainters:DYHUxLsFoIg3GlXhZM5I@mongo22.mydevil.net/mo1292_brainters', , {useNewUrlParser: true});
 // for development
-// mongoose.connect('mongodb://mo1292_brainterd:T561x4fzFwsJMIOzq13g@mongo22.mydevil.net/mo1292_brainterd');
+mongoose.connect('mongodb://mo1292_brainterd:T561x4fzFwsJMIOzq13g@mongo22.mydevil.net/mo1292_brainterd', { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));

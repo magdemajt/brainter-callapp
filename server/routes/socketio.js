@@ -27,7 +27,9 @@ const {
   joinMultiRoom,
   startMultiTalk,
   createMultiTalk,
-  saveTimetable
+  saveTimetable,
+  addTeachingIn,
+  getTeachingIn
 } = require('../controllers/lessonController');
 const {
   createNewMessage,
@@ -41,6 +43,10 @@ const {
   getRecommendedUsers,
   findUsers
 } = require('../controllers/usersController');
+
+const {
+  findTagsWithFilter
+} = require('../controllers/tagsController');
 
 module.exports = (io) => {
   io.use(validateUserTokenSockets);
@@ -83,7 +89,10 @@ module.exports = (io) => {
     socket.on('get_messages', data => getMessages(io, socket, data));
     socket.on('begin_chat', data => beginChat(io, socket, data));
     socket.on('find_users', data => findUsers(io, socket, data));
+    socket.on('find_tags_with_filter', data => findTagsWithFilter(io, socket, data));
     socket.on('save_timetable', data => saveTimetable(io, socket, data));
+    socket.on('save_teaching_in', data => addTeachingIn(io, socket, data));
+    socket.on('get_teaching_in', data => getTeachingIn(io, socket, data));
     socket.on('disconnect', data => userNotActive(io, socket, data));
   });
 };

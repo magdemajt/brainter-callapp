@@ -2,10 +2,11 @@ import React, {
   Component, useState, useEffect, useRef
 } from 'react';
 import { connect } from 'react-redux';
+import { makeStyles, CircularProgress } from '@material-ui/core';
 import ChatMessage from './ChatMessage';
 
 const Messagebox = ({
-  user, messages, manualScroll, setManualScroll, authUser, socket, className
+  user, messages, manualScroll, setManualScroll, authUser, socket
 }) => {
   const [loadingData, setLoadingData] = useState(false);
   // const [uploadFiles, setUploadFiles] = useState(false);
@@ -53,17 +54,27 @@ const Messagebox = ({
     setLoadingData(false);
   }, [messages]);
 
+  const classes = makeStyles(theme => ({
+    root: {
+      flex: 2,
+      display: 'flex',
+      flexDirection: 'column'
+    },
+    progress: {
+      margin: theme.spacing(2)
+    }
+  }))();
 
   if (user && user.hasOwnProperty('_id')) {
-    const messagesRendered = messages.map((message, index, arr) => (<ChatMessage message={message} key={message._id} float={message.sender === authUser._id} bottom={index === arr.length - 1} />));
+    const messagesRendered = messages.map((message, index, arr) => (<ChatMessage message={message} key={message._id} float={message.sender._id === authUser._id} bottom={index === arr.length - 1} />));
     return (
       <React.Fragment>
-        <ul ref={messageRef} className={className} onScroll={handleScroll}>
+        <div ref={messageRef} onScroll={handleScroll} className={classes.root}>
           {loadingData
-            ? <li>...</li>
+            ? <CircularProgress className={classes.progress} color="primary" />
             : null}
           {messagesRendered}
-        </ul>
+        </div>
       </React.Fragment>
     );
   }

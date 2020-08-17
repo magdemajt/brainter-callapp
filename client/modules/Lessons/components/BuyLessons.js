@@ -1,23 +1,42 @@
 import React, { Component, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { addMonths } from 'date-fns';
+import { addMonths, addDays } from 'date-fns';
 import DatesPicker from './DatesPicker';
-import ScheduleManager from './ScheduleManager';
+import ScheduleManagerContainer from './ScheduleManagerContainer';
+import OptionsManager from './OptionsManager';
 
 const BuyLessons = ({
-
+  socket
 }) => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(addDays(new Date(), 2));
   const [endDate, setEndDate] = useState(addMonths(new Date(), 1));
   const [schedule, setSchedule] = useState([]);
+  // const [lessonsWeekly, setLessonsWeekly] = useState(false); // If false it means that lessons won't be looped weekly, add in the future
+  const [maxPeople, setMaxPeople] = useState(1);
+  useEffect(() => {
+    socket.emit('calculate_lesson_cost', {
+      schedule, startDate, endDate, maxPeople
+    });
+  }, [schedule, startDate, endDate, maxPeople]);
+  useEffect(() => {
+    socket.on('receive_cost', (data) => {
+
+    });
+    return () => {
+      socket.removeListener('receive_cost');
+    };
+  }, [socket]);
   const test = '';
   return (
-    <React.Fragment>
+    <div style={{
+      display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', width: '100%'
+    }}
+    >
       <DatesPicker startDateState={[startDate, setStartDate]} endDateState={[endDate, setEndDate]} />
-      <ScheduleManager scheduleState={[schedule, setSchedule]} />
-      {/* <OptionsManager /> */}
+      <ScheduleManagerContainer scheduleState={[schedule, setSchedule]} />
+      <OptionsManager maxPeopleState={[maxPeople, setMaxPeople]} />
       {/* <CostManager /> */}
-    </React.Fragment>
+    </div>
   );
 };
 

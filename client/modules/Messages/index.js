@@ -5,9 +5,21 @@ import UserSelection from './components/UserSelection';
 import Chatbox from './components/Chatbox';
 import _ from 'lodash';
 import NewMessageUserModal from './components/NewMessageUserModal';
+import { withStyles } from '@material-ui/styles';
+import { IconButton, Grid, Paper } from '@material-ui/core';
+import Add from '@material-ui/icons/Add';
 
 // Import Style
-
+const styles = theme => ({
+  root: {
+    display: 'flex'
+  },
+  flexCenter: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+});
 
 // Import Components
 
@@ -86,21 +98,38 @@ class Messages extends Component {
   }
 
   generateMessagePanel = () => {
+    const { classes } = this.props;
     return (
-      <li key="magicpanel">
-        <button className="create-btn" onClick={() => this.setState({createMUserModal: true})}/>
-      </li>
+      <div className={classes.flexCenter}>
+        <IconButton onClick={() => this.setState({createMUserModal: true})}>
+          <Add />
+        </IconButton>
+      </div>
     );
   }
 
   render() {
+    const { classes } = this.props;
     const messagePanel = this.generateMessagePanel();
+    const StyledPaper = withStyles(theme => ({
+      root: {
+        margin: theme.spacing(2),
+        overflowY: 'auto',
+        height: theme.spacing(59)
+      }
+    }))(Paper);
     return (
-      <div className="container fluid center offset-8 height-60">
-        <UserSelection onSelect={this.onSelect} messagePanel={messagePanel} getMoreMessageUsers={this.getMoreMessageUsers} listRef={this.listRef}/>
-        <Chatbox disabledInput={this.props.user.participants.filter(part => part !== null).length < 2} messages={this.props.user !== undefined && this.props.user.hasOwnProperty('messages') ? this.props.user.messages : []} />
+      <React.Fragment>
+        <Grid container spacing={0}>
+          <Grid item xs={3}>
+            <StyledPaper>
+              <UserSelection onSelect={this.onSelect} messagePanel={messagePanel} getMoreMessageUsers={this.getMoreMessageUsers} listRef={this.listRef}/>
+            </StyledPaper>
+          </Grid>
+          <Chatbox disabledInput={this.props.user.participants.filter(part => part !== null).length < 2} messages={this.props.user !== undefined && this.props.user.hasOwnProperty('messages') ? this.props.user.messages : []} />
+        </Grid>
         <NewMessageUserModal opened={this.state.createMUserModal} closeModal={this.closeModal} />
-      </div>
+      </React.Fragment>
     );
   }
 }
@@ -163,4 +192,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 /* eslint-enable */
 
-export default connect(mapStateToProps, mapDispatchToProps)(Messages);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Messages));

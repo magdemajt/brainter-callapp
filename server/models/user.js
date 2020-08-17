@@ -13,6 +13,10 @@ const userSchema = new Schema({
     tag: { type: Schema.Types.ObjectId, ref: 'Tag' },
     level: { type: 'Number', default: 0 },
   }],
+  teachingIn: [{
+    tag: { type: Schema.Types.ObjectId, ref: 'Tag' },
+    price: { type: 'Number', default: 0 }
+  }],
   token: { type: 'String', default: '', select: false },
   active: { type: 'Boolean', default: false },
   inCall: { type: 'Boolean', default: false },

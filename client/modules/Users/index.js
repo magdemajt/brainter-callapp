@@ -4,7 +4,7 @@ import { updateAuth, addAuthTags, deleteAuthTags, updateWithTags, updateAuthWith
 import SearchUserByName from './components/SearchUserByName';
 import SearchUserByTags from './components/SearchUsersByTags';
 import history from '../../history';
-import _ from 'lodash';
+import { flatMap } from 'lodash';
 import TeachByTags from './components/TeachByTags';
 import TagTalkModal from '../../components/TagTalkModal';
 import TagTalkTeacherModal from '../../components/TagTalkTeacherModal';
@@ -46,13 +46,13 @@ class Users extends Component {
       this.props.socket.removeListener('your_teacher_talk');
       this.props.socket.removeListener('multi_talks');
       this.props.socket.on('teacher_talks', (data) => {
-        const talks = _.flatMap(data.teacherTalks, (o) => o.talks);
+        const talks = flatMap(data.teacherTalks, (o) => o.talks);
         this.setState({ dateDifference: data.date - Date.now});
         this.props.initTeacherTalks(talks);
         this.setState({ teacherModal: 1 });
       });
       this.props.socket.on('multi_talks', (data) => {
-        const talks = _.flatMap(data.teacherTalks, (o) => o.talks);
+        const talks = flatMap(data.teacherTalks, (o) => o.talks);
         this.props.initTeacherTalks(talks);
         this.setState({ teacherModal: 2 });
       });

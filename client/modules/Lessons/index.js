@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import _ from 'lodash';
+import { flattenDeep } from 'lodash';
 import Toolbar from './components/Toolbar';
 import history from '../../history';
 import MyLessons from './components/MyLessons';
@@ -11,10 +11,11 @@ const Lessons = ({
   socket, authUser
 }) => {
   const [currentView, setCurrentView] = useState('mylessons');
-  const [timetable, setTimetable] = useState([{ day: 'monday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'tuesday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'wednesday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'thursday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'friday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'saturday', hoursPlan: (new Array(24 * 2)).fill(false) }, { day: 'sunday', hoursPlan: (new Array(24 * 2)).fill(false) }]);
+  const [timetable, setTimetable] = useState([{ day: 'monday', shortDay: 'mon', hoursPlan: [] }, { day: 'tuesday', shortDay: 'tue', hoursPlan: [] }, { day: 'wednesday', shortDay: 'wed', hoursPlan: [] }, { day: 'thursday', shortDay: 'thu', hoursPlan: [] }, { day: 'friday', shortDay: 'fri', hoursPlan: [] }, { day: 'saturday', shortDay: 'sat', hoursPlan: [] }, { day: 'sunday', shortDay: 'sun', hoursPlan: [] }]);
+  const [teacher, setTeacher] = useState(false);
   useEffect(() => {
-    if (authUser.timetable.length > 0) {
-      setTimetable(_.flattenDeep(authUser.timetable));
+    if (authUser.timetable !== undefined && authUser.timetable.length > 0) {
+      setTimetable(flattenDeep(authUser.timetable));
     }
   }, [authUser]);
   function generateCurrentView() {
@@ -42,7 +43,7 @@ const Lessons = ({
   return (
     <div className="container center offset-8 fluid height-60 flex space-between">
       {generateCurrentView()}
-      <Toolbar currentViewState={[currentView, setCurrentView]} />
+      <Toolbar currentViewState={[currentView, setCurrentView]} teacherState={[teacher, setTeacher]} />
     </div>
   );
 };

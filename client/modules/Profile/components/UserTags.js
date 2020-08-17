@@ -1,54 +1,46 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
+import {
+  map
+} from 'lodash';
 import { connect } from 'react-redux';
+import {
+  Grid, Chip, makeStyles
+} from '@material-ui/core';
+
 
 const UserTags = ({
-  user, editing = false, onChangeProp, updateExisting, filteredTags = []
+  user
 }) => {
-  const editingContent = [];
-  const tagsProposal = [];
-  if (editing) {
-    filteredTags.forEach((tag) => {
-      if (!user.tags.find(elem => elem._id === tag._id)) {
-        tagsProposal.push(
-          <li key={tag._id} className="tag">
-            {tag.name}
-            <button className="plus" onClick={() => onChangeProp({ _id: tag._id, level: 1, name: tag.name }, 'add')} />
-          </li>
-        );
-      }
-    });
+  const classes = makeStyles((theme => ({
+    root: {
+      margin: 'auto',
+      marginBottom: theme.spacing(2)
+    },
+    paper: {
+      width: 200,
+      height: 230,
+      overflow: 'auto',
+    },
+    button: {
+      margin: theme.spacing(0.5, 0),
+    },
+  })))();
 
-    user.tags.forEach((tag, key) => {
-      editingContent.push(
-        <li key={tag._id} className="tag">
-          {tag.name}
-          <button onClick={() => onChangeProp({ _id: tag._id }, 'remove')} className="minus" />
-          <input className="tag-input" value={tag.level} type="number" onChange={e => updateExisting({ _id: tag._id, level: e.target.value > 0 && e.target.value <= 10 ? e.target.value : tag.level, name: tag.name }, key)} />
-        </li>
-      );
-    });
-  } else {
-    user.tags.forEach((tag, key) => {
-      editingContent.push(
-        <li key={tag._id} className="tag">
-          {tag.name}
-          <span className="badge">
-            {tag.level}
-          </span>
-        </li>
-      );
-    });
-  }
+  const generateTags = () => map(user.tags, (tag, index) => (
+    <Grid item key={tag._id}>
+      <Chip
+        key={tag._id}
+        label={tag.name}
+      />
+    </Grid>
+  ));
+
+
+  const tags = generateTags();
   return (
-    <div className="row-5">
-      <div className="col-10">
-        <ul className="tags-list">
-          {editingContent}
-          <hr />
-          {tagsProposal}
-        </ul>
-      </div>
-    </div>
+    <Grid container spacing={2} justify="flex-start" alignItems="flex-start" className={classes.root}>
+      {tags}
+    </Grid>
   );
 };
 

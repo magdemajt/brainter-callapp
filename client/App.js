@@ -18,33 +18,38 @@ import Settings from './modules/Settings';
 import Admin from './modules/Admin';
 import Surveys from './modules/Surveys';
 import Lessons from './modules/Lessons';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
+export default function App() {
+  const theme = createMuiTheme({
+    palette: {
+      primary: { main: '#2E75B6' },
+      secondary: {
+        main: '#ffd966',
+      },
+    },
+  });
 
-    // Naprawić problem z zbyt wczesnym montowaniem NavMenu
-  }
-
-  render() {
-    return (
-      <div>
-        <NavMenu />
-        <Switch>
-          <PrivateRoute exact path="/" component={Home} />
-          <PrivateRoute exact path="/profile" component={Profile} />
-          <PrivateRoute path="/users/:id" component={UserProfile} />
-          <PrivateRoute path="/messages/:id/:talking" component={Messages} />
-          <PrivateRoute exact path="/users" component={Users} />
-          <PrivateRoute path="/talk" component={Talk} />
-          <PrivateRoute path="/settings" component={Settings} />
-          <PrivateRoute path="/lessons" component={Lessons} />
-          <NoRegisterRoute path="/login" component={Login} />
-          <NoRegisterRoute path="/register" component={Register} />
-          <PrivateRoute path="/admin" component={Admin} />
-          <PrivateRoute path="/surveys" component={Surveys} />
-        </Switch>
-      </div>
-    );
-  }
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <NavMenu />
+      <Switch>
+        <PrivateRoute exact path="/" component={Home} />
+        <PrivateRoute exact path="/profile" component={Profile} />
+        <PrivateRoute path="/users/:id" component={UserProfile} />
+        <PrivateRoute path="/messages/:id/:talking" component={Messages} />
+        <PrivateRoute exact path="/users" component={Users} />
+        <PrivateRoute path="/talk" component={Talk} />
+        <PrivateRoute path="/settings" component={Settings} />
+        <PrivateRoute path="/lessons" component={Lessons} />
+        <NoRegisterRoute path="/login" component={Login} />
+        <NoRegisterRoute path="/register" component={Register} />
+        <PrivateRoute path="/admin" component={Admin} />
+        <PrivateRoute path="/surveys" component={Surveys} />
+      </Switch>
+    </ThemeProvider>
+  );
 }

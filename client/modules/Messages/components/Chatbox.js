@@ -2,16 +2,47 @@ import React, {
   Component, useState, useEffect, useRef
 } from 'react';
 import { connect } from 'react-redux';
+import {
+  makeStyles, Grid, withStyles, Paper
+} from '@material-ui/core';
 import ChatInput from './ChatInput';
 import ChatMessage from './ChatMessage';
 import Messagebox from './Messagebox';
 
 const Chatbox = (props) => {
+  const classes = makeStyles(theme => ({
+    stickedToBottom: {
+      bottom: theme.spacing(2),
+      top: 'auto',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '99vw',
+      marginLeft: theme.spacing(2),
+      marginRight: theme.spacing(2),
+      position: 'fixed'
+    },
+  }))();
+  const StyledPaper = withStyles(theme => ({
+    root: {
+      margin: theme.spacing(2),
+      overflowY: 'auto',
+      height: theme.spacing(60)
+    }
+  }))(Paper);
   if (props.user && props.user.hasOwnProperty('_id')) {
     return (
       <React.Fragment>
-        <Messagebox className="message-container" messages={props.messages} />
-        <ChatInput disabled={props.disabledInput} className="container fixed bottom full-70 flex justify-center" />
+        <Grid item xs={9}>
+          <StyledPaper>
+            <Messagebox className="message-container" messages={props.messages} />
+          </StyledPaper>
+        </Grid>
+        {/* <div className={classes.stickedToBottom}> */}
+        <Grid item className={classes.stickedToBottom} xs={12}>
+          <ChatInput disabled={props.disabledInput} className="container fixed bottom full-70 flex justify-center" />
+        </Grid>
+        {/* </div> */}
       </React.Fragment>
     );
   }

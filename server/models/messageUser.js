@@ -1,7 +1,7 @@
 
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const messageUserSchema = new Schema({
   participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
@@ -14,13 +14,18 @@ messageUserSchema.statics.findMessageUsers = function (user, part, callback) {
     .sort('+updatedAt')
     .limit(15)
     .skip(part * 15)
-    .populate({ path: 'participants', select: 'name' })
+    .populate({ path: 'participants', select: ['name', 'photo'] })
     .populate({
       path: 'messages',
       options: {
         limit: 25,
         sort: '-createdAt',
       }
+    })
+    .populate({
+      path: 'messages.sender',
+      select: ['photo', 'name'],
+      model: 'User'
     })
     .then(callback);
 };
@@ -40,6 +45,9 @@ messageUserSchema.statics.findMessages = function (messageUser, part, callback) 
         sort: '-createdAt',
         skip: part
       }
+    }).populate({
+      path: 'messages.sender',
+      select: ['photo', 'name']
     })
     .then(callback);
 };
@@ -56,13 +64,13 @@ messageUserSchema.statics.createOrReturn = function (participants, requester, ca
         sort: '-createdAt'
       }
     })
-    .populate({ path: 'participants', select: 'name' })
+    .populate({ path: 'participants', select: ['name', 'photo'] })
     .then((mu) => {
       if (mu.length > 0) {
         callback(mu);
       } else {
         this.create({ participants, requestingId: requester }).then((messageUser) => {
-          this.find({ _id: messageUser._id }).populate({ path: 'participants', select: 'name' }).then(callback);
+          this.find({ _id: messageUser._id }).populate({ path: 'participants', select: ['name', 'photo'] }).then(callback);
         });
       }
     });

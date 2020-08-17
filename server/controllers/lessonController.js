@@ -172,3 +172,16 @@ exports.cancelTalk = (io, socket, data) => {
 exports.cancelTeaching = (io, socket, data) => {
   socket.leave('teachers_room');
 };
+
+exports.addTeachingIn = (io, socket, data) => {
+  const teachingIn = data.tags.map(tag => ({ tag: tag._id, price: tag.price }));
+  User.updateOne({ _id: socket.authUser._id }, { $set: { teachingIn } }).then((u) => {
+    socket.emit('confirm_add_teaching');
+  }).catch(err => console.log(err));
+};
+
+exports.getTeachingIn = (io, socket, data) => {
+  User.findById(socket.authUser._id).populate({ path: 'teachingIn.tag' }).then((user) => {
+    socket.emit('got_teaching_in', { teachingIn: user.teachingIn });
+  }).catch(err => console.log(err));
+};

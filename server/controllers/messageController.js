@@ -18,7 +18,7 @@ exports.createNewMessage = (io, socket, data) => {
   message.save().then(() => {
     socket.emit('message', {
       messageUser: data.messageUser,
-      sender: socket.authUser._id,
+      sender: { _id: socket.authUser._id, photo: socket.authUser.photo },
       text: data.text,
       _id: message._id,
       seen: []
@@ -28,7 +28,7 @@ exports.createNewMessage = (io, socket, data) => {
         if (part.toString() !== socket.authUser._id.toString()) {
           io.to(`room_${part}`).emit('message', {
             messageUser: data.messageUser,
-            sender: socket.authUser._id,
+            sender: { _id: socket.authUser._id, photo: socket.authUser.photo },
             text: data.text,
             _id: message._id,
             seen: []
@@ -51,13 +51,23 @@ exports.seenMessages = (io, socket, data) => {
 };
 
 exports.getMessages = (io, socket, data) => {
-  MessageUser.findMessages(data.messageUser, data.part || 0, (messages) => {
-    socket.emit('messages', messages);
+  MessageUser.findMessages(data.messageUser, data.part || 0, (docs) => {
+    User.populate(docs, {
+      path: 'messages.sender',
+      select: ['name', 'photo']
+    }).then((messages) => {
+      socket.emit('messages', messages);
+    });
   });
 };
 
 exports.getMessageUsers = (io, socket, data) => {
-  MessageUser.findMessageUsers(socket.authUser._id, data.part, (messageUsers) => {
-    socket.emit('message_users', messageUsers);
+  MessageUser.findMessageUsers(socket.authUser._id, data.part, (docs) => {
+    User.populate(docs, {
+      path: 'messages.sender',
+      select: ['name', 'photo']
+    }).then((messageUsers) => {
+      socket.emit('message_users', messageUsers);
+    });
   });
 };

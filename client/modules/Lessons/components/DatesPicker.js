@@ -17,7 +17,7 @@ const DatesPicker = ({
       }}
     >
       {'Start Date'}
-      <DatePicker minDate={addDays(new Date(), 1)} maxDate={endDate} selected={startDate} onChange={e => setStartDate(e)} />
+      <DatePicker minDate={addDays(new Date(), 2)} maxDate={endDate} selected={startDate} onChange={e => setStartDate(e)} />
       {'End Date'}
       <DatePicker minDate={startDate} maxDate={addMonths(startDate, 2)} selected={endDate} onChange={e => setEndDate(e)} />
     </div>

@@ -1,6 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
+import {
+  Badge, Avatar, withStyles
+} from '@material-ui/core';
+
+const StyledBadge = withStyles(theme => ({
+  root: {
+    margin: theme.spacing(2),
+    userSelect: 'none'
+  },
+  colorPrimary: {
+    background: '#42b72a',
+    color: '#42b72a'
+  },
+  colorSecondary: {
+    background: '#ff0000',
+    color: '#ff0000'
+  }
+}))(Badge);
 
 const ProfileIcon = ({ editing, user, onDrop }) => {
   let content;
@@ -8,23 +26,21 @@ const ProfileIcon = ({ editing, user, onDrop }) => {
     content = (
       <React.Fragment>
         <Dropzone onDrop={onDrop} id="dropzone-image">
-          <img id="profile-image" src={`/api/user/photo/${user._id}`} alt="Profile" />
-          Drop photo right here
+          <Avatar src={`/api/user/photo/${user._id}`} alt={`${user.name} Image`} />
         </Dropzone>
       </React.Fragment>
     );
   } else { /* eslint-enable */
     content = (
-      <React.Fragment>
-        <img id="profile-image" src={`/api/user/photo/${user._id}`} alt="Profile" />
-        <span className={user.active ? 'user-active' : 'user-active not'} />
-      </React.Fragment>
+      <StyledBadge variant="standard" color={user.active ? 'primary' : 'secondary'} badgeContent={4}>
+        <Avatar src={`/api/user/photo/${user._id}`} alt={`${user.name} Image`} />
+      </StyledBadge>
     );
   }
   return (
-    <div className="col-3 image">
+    <React.Fragment>
       {content}
-    </div>
+    </React.Fragment>
   );
 };
 

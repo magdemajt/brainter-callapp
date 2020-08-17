@@ -44,7 +44,7 @@ const phrases = {
   },
   messages: {
     noUser: 'User was deleted',
-    messageInput: 'Enter text of your message...'
+    messageInput: 'New message...'
   },
   user: {
     sendmsg: 'Send message',

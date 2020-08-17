@@ -8,14 +8,31 @@ const TagAction = require('../models/tagAction');
 
 exports.getTags = (req, res) => {
   Tag.find({})
-  .then(tags => {
-    res.send(tags);
-  })
-  .catch(err => {
-    console.log(err);
-    res.sendStatus(500);
-  })
-}
+    .then((tags) => {
+      res.send(tags);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+};
+exports.findTagsWithFilter = (io, socket, data) => {
+  if ((data.forTeaching !== undefined && data.forTeaching)) {
+    User.findById(socket.authUser._id).populate({ path: 'tags.tag' }).lean().then((u) => {
+      const tags = u.tags.filter(tagSchema => (new RegExp(data.tagFilter, 'i')).test(tagSchema.tag.name));
+      socket.emit('found_tags', { tags });
+    })
+      .catch(err => console.log(err));
+  } else {
+    Tag.find({ name: new RegExp(data.tagFilter, 'i') })
+      .then((tags) => {
+        socket.emit('found_tags', { tags });
+      })
+      .catch((err) => {
+
+      });
+  }
+};
 
 exports.addTag = (req, res) => {
   const tag = new Tag({
@@ -24,14 +41,14 @@ exports.addTag = (req, res) => {
   });
   const talkPool = new TalkPool({
     tag,
-    name: 'New Pool ' + parseInt(Math.random() * 10000) - parseInt(Math.random() * 5)
+    name: `New Pool ${parseInt(Math.random() * 10000)}` - parseInt(Math.random() * 5)
   });
   tag.save().then(() => {
     talkPool.save().then(() => {
       res.send(true);
     });
-  }).catch(err => {
+  }).catch((err) => {
     console.log(err);
     res.sendStatus(500);
   });
-}
+};
