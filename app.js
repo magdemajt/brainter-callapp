@@ -16,13 +16,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 require('./server/routes/socketio')(io);
-// mongoose.connect('mongodb://admin:admin@localhost:27017/Brainter');
 const transporter = nodeMailer.createTransport('smtps://?pool=true');
-// Hasło do maila no-reply@brainter.study - F1UZgi8nU2LOHnyDXcRE
-
-// for build
-// mongoose.connect('mongodb://mo1292_brainters:DYHUxLsFoIg3GlXhZM5I@mongo22.mydevil.net/mo1292_brainters', , {useNewUrlParser: true});
-// for development
 mongoose.connect('mongodb://', { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 
