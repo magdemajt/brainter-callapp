@@ -32,7 +32,7 @@
     "multer": "^1.3.1",
     "node-polyglot": "^2.3.0",
     "node-sass": "^4.12.0",
-    "nodemailer": "^4.7.0",
+    "nodemailer": "^6.4.16",
     "rc-tooltip": "^3.7.3",
     "react": "^16.8.6",
     "react-beforeunload": "^1.0.4",
